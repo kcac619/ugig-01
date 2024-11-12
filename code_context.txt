@@ -1,1049 +1,5 @@
 
 
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\accordion.tsx
-import { Accordion, HStack } from "@chakra-ui/react"
-import { forwardRef } from "react"
-import { LuChevronDown } from "react-icons/lu"
-
-interface AccordionItemTriggerProps extends Accordion.ItemTriggerProps {
-  indicatorPlacement?: "start" | "end"
-}
-
-export const AccordionItemTrigger = forwardRef<
-  HTMLButtonElement,
-  AccordionItemTriggerProps
->(function AccordionItemTrigger(props, ref) {
-  const { children, indicatorPlacement = "end", ...rest } = props
-  return (
-    <Accordion.ItemTrigger {...rest} ref={ref}>
-      {indicatorPlacement === "start" && (
-        <Accordion.ItemIndicator rotate={{ base: "-90deg", _open: "0deg" }}>
-          <LuChevronDown />
-        </Accordion.ItemIndicator>
-      )}
-      <HStack gap="4" flex="1" textAlign="start" width="full">
-        {children}
-      </HStack>
-      {indicatorPlacement === "end" && (
-        <Accordion.ItemIndicator>
-          <LuChevronDown />
-        </Accordion.ItemIndicator>
-      )}
-    </Accordion.ItemTrigger>
-  )
-})
-
-interface AccordionItemContentProps extends Accordion.ItemContentProps {}
-
-export const AccordionItemContent = forwardRef<
-  HTMLDivElement,
-  AccordionItemContentProps
->(function AccordionItemContent(props, ref) {
-  return (
-    <Accordion.ItemContent>
-      <Accordion.ItemBody {...props} ref={ref} />
-    </Accordion.ItemContent>
-  )
-})
-
-export const AccordionRoot = Accordion.Root
-export const AccordionItem = Accordion.Item
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\action-bar.tsx
-import { ActionBar, Portal } from "@chakra-ui/react"
-import { CloseButton } from "./close-button"
-import { forwardRef } from "react"
-
-interface ActionBarContentProps extends ActionBar.ContentProps {
-  portalled?: boolean
-  portalRef?: React.RefObject<HTMLElement>
-}
-
-export const ActionBarContent = forwardRef<
-  HTMLDivElement,
-  ActionBarContentProps
->(function ActionBarContent(props, ref) {
-  const { children, portalled = true, portalRef, ...rest } = props
-
-  return (
-    <Portal disabled={!portalled} container={portalRef}>
-      <ActionBar.Positioner>
-        <ActionBar.Content ref={ref} {...rest} asChild={false}>
-          {children}
-        </ActionBar.Content>
-      </ActionBar.Positioner>
-    </Portal>
-  )
-})
-
-export const ActionBarCloseTrigger = forwardRef<
-  HTMLButtonElement,
-  ActionBar.CloseTriggerProps
->(function ActionBarCloseTrigger(props, ref) {
-  return (
-    <ActionBar.CloseTrigger {...props} asChild ref={ref}>
-      <CloseButton size="sm" />
-    </ActionBar.CloseTrigger>
-  )
-})
-
-export const ActionBarRoot = ActionBar.Root
-export const ActionBarSelectionTrigger = ActionBar.SelectionTrigger
-export const ActionBarSeparator = ActionBar.Separator
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\alert.tsx
-import { Alert as ChakraAlert } from "@chakra-ui/react"
-import { CloseButton } from "./close-button"
-import { forwardRef } from "react"
-
-export interface AlertProps extends Omit<ChakraAlert.RootProps, "title"> {
-  startElement?: React.ReactNode
-  endElement?: React.ReactNode
-  title?: React.ReactNode
-  icon?: React.ReactElement
-  closable?: boolean
-  onClose?: () => void
-}
-
-export const Alert = forwardRef<HTMLDivElement, AlertProps>(
-  function Alert(props, ref) {
-    const {
-      title,
-      children,
-      icon,
-      closable,
-      onClose,
-      startElement,
-      endElement,
-      ...rest
-    } = props
-    return (
-      <ChakraAlert.Root ref={ref} {...rest}>
-        {startElement || <ChakraAlert.Indicator>{icon}</ChakraAlert.Indicator>}
-        {children ? (
-          <ChakraAlert.Content>
-            <ChakraAlert.Title>{title}</ChakraAlert.Title>
-            <ChakraAlert.Description>{children}</ChakraAlert.Description>
-          </ChakraAlert.Content>
-        ) : (
-          <ChakraAlert.Title flex="1">{title}</ChakraAlert.Title>
-        )}
-        {endElement}
-        {closable && (
-          <CloseButton
-            size="sm"
-            pos="relative"
-            top="-2"
-            insetEnd="-2"
-            alignSelf="flex-start"
-            onClick={onClose}
-          />
-        )}
-      </ChakraAlert.Root>
-    )
-  },
-)
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\avatar.tsx
-"use client"
-
-import type { GroupProps, SlotRecipeProps } from "@chakra-ui/react"
-import { Avatar as ChakraAvatar, Group } from "@chakra-ui/react"
-import { forwardRef } from "react"
-
-type ImageProps = React.ImgHTMLAttributes<HTMLImageElement>
-
-export interface AvatarProps extends ChakraAvatar.RootProps {
-  name?: string
-  src?: string
-  srcSet?: string
-  loading?: ImageProps["loading"]
-  icon?: React.ReactElement
-  fallback?: React.ReactNode
-}
-
-export const Avatar = forwardRef<HTMLDivElement, AvatarProps>(
-  function Avatar(props, ref) {
-    const { name, src, srcSet, loading, icon, fallback, children, ...rest } =
-      props
-    return (
-      <ChakraAvatar.Root ref={ref} {...rest}>
-        <AvatarFallback name={name} icon={icon}>
-          {fallback}
-        </AvatarFallback>
-        <ChakraAvatar.Image src={src} srcSet={srcSet} loading={loading} />
-        {children}
-      </ChakraAvatar.Root>
-    )
-  },
-)
-
-interface AvatarFallbackProps extends ChakraAvatar.FallbackProps {
-  name?: string
-  icon?: React.ReactElement
-}
-
-const AvatarFallback = forwardRef<HTMLDivElement, AvatarFallbackProps>(
-  function AvatarFallback(props, ref) {
-    const { name, icon, children, ...rest } = props
-    return (
-      <ChakraAvatar.Fallback ref={ref} {...rest}>
-        {children}
-        {name != null && children == null && <>{getInitials(name)}</>}
-        {name == null && children == null && (
-          <ChakraAvatar.Icon asChild={!!icon}>{icon}</ChakraAvatar.Icon>
-        )}
-      </ChakraAvatar.Fallback>
-    )
-  },
-)
-
-function getInitials(name: string) {
-  const names = name.trim().split(" ")
-  const firstName = names[0] != null ? names[0] : ""
-  const lastName = names.length > 1 ? names[names.length - 1] : ""
-  return firstName && lastName
-    ? `${firstName.charAt(0)}${lastName.charAt(0)}`
-    : firstName.charAt(0)
-}
-
-interface AvatarGroupProps extends GroupProps, SlotRecipeProps<"avatar"> {}
-
-export const AvatarGroup = forwardRef<HTMLDivElement, AvatarGroupProps>(
-  function AvatarGroup(props, ref) {
-    const { size, variant, borderless, ...rest } = props
-    return (
-      <ChakraAvatar.PropsProvider value={{ size, variant, borderless }}>
-        <Group gap="0" spaceX="-3" ref={ref} {...rest} />
-      </ChakraAvatar.PropsProvider>
-    )
-  },
-)
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\blockquote.tsx
-import { Blockquote as ChakraBlockquote } from "@chakra-ui/react"
-import { forwardRef } from "react"
-
-export interface BlockquoteProps extends ChakraBlockquote.RootProps {
-  cite?: React.ReactNode
-  citeUrl?: string
-  icon?: React.ReactNode
-  showDash?: boolean
-}
-
-export const Blockquote = forwardRef<HTMLDivElement, BlockquoteProps>(
-  function Blockquote(props, ref) {
-    const { children, cite, citeUrl, showDash, icon, ...rest } = props
-
-    return (
-      <ChakraBlockquote.Root ref={ref} {...rest}>
-        {icon}
-        <ChakraBlockquote.Content cite={citeUrl}>
-          {children}
-        </ChakraBlockquote.Content>
-        {cite && (
-          <ChakraBlockquote.Caption>
-            {showDash ? <>&mdash;</> : null} <cite>{cite}</cite>
-          </ChakraBlockquote.Caption>
-        )}
-      </ChakraBlockquote.Root>
-    )
-  },
-)
-
-export const BlockquoteIcon = ChakraBlockquote.Icon
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\breadcrumb.tsx
-import { Breadcrumb, type SystemStyleObject } from "@chakra-ui/react"
-import { Children, Fragment, forwardRef, isValidElement } from "react"
-
-export interface BreadcrumbRootProps extends Breadcrumb.RootProps {
-  separator?: React.ReactNode
-  separatorGap?: SystemStyleObject["gap"]
-}
-
-export const BreadcrumbRoot = forwardRef<HTMLDivElement, BreadcrumbRootProps>(
-  function BreadcrumbRoot(props, ref) {
-    const { separator, separatorGap, children, ...rest } = props
-    const validChildren = Children.toArray(children).filter(isValidElement)
-    return (
-      <Breadcrumb.Root ref={ref} {...rest}>
-        <Breadcrumb.List gap={separatorGap}>
-          {validChildren.map((child, index) => {
-            const last = index === validChildren.length - 1
-            return (
-              <Fragment key={index}>
-                <Breadcrumb.Item>{child}</Breadcrumb.Item>
-                {!last && (
-                  <Breadcrumb.Separator>{separator}</Breadcrumb.Separator>
-                )}
-              </Fragment>
-            )
-          })}
-        </Breadcrumb.List>
-      </Breadcrumb.Root>
-    )
-  },
-)
-
-export const BreadcrumbLink = Breadcrumb.Link
-export const BreadcrumbCurrentLink = Breadcrumb.CurrentLink
-export const BreadcrumbEllipsis = Breadcrumb.Ellipsis
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\button.tsx
-import type { ButtonProps as ChakraButtonProps } from "@chakra-ui/react"
-import {
-  AbsoluteCenter,
-  Button as ChakraButton,
-  Span,
-  Spinner,
-} from "@chakra-ui/react"
-import { forwardRef } from "react"
-
-interface ButtonLoadingProps {
-  loading?: boolean
-  loadingText?: React.ReactNode
-}
-
-export interface ButtonProps extends ChakraButtonProps, ButtonLoadingProps {}
-
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  function Button(props, ref) {
-    const { loading, disabled, loadingText, children, ...rest } = props
-    return (
-      <ChakraButton disabled={loading || disabled} ref={ref} {...rest}>
-        {loading && !loadingText ? (
-          <>
-            <AbsoluteCenter display="inline-flex">
-              <Spinner size="inherit" color="inherit" />
-            </AbsoluteCenter>
-            <Span opacity={0}>{children}</Span>
-          </>
-        ) : loading && loadingText ? (
-          <>
-            <Spinner size="inherit" color="inherit" />
-            {loadingText}
-          </>
-        ) : (
-          children
-        )}
-      </ChakraButton>
-    )
-  },
-)
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\checkbox-card.tsx
-import { CheckboxCard as ChakraCheckboxCard } from "@chakra-ui/react"
-import { Fragment, forwardRef } from "react"
-
-export interface CheckboxCardProps extends ChakraCheckboxCard.RootProps {
-  icon?: React.ReactElement
-  label?: React.ReactNode
-  description?: React.ReactNode
-  addon?: React.ReactNode
-  indicator?: React.ReactNode | null
-  indicatorPlacement?: "start" | "end" | "inside"
-  inputProps?: React.InputHTMLAttributes<HTMLInputElement>
-}
-
-export const CheckboxCard = forwardRef<HTMLInputElement, CheckboxCardProps>(
-  function CheckboxCard(props, ref) {
-    const {
-      inputProps,
-      label,
-      description,
-      icon,
-      addon,
-      indicator = <ChakraCheckboxCard.Indicator />,
-      indicatorPlacement = "end",
-      ...rest
-    } = props
-
-    const hasContent = label || description || icon
-    const ContentWrapper = indicator ? ChakraCheckboxCard.Content : Fragment
-
-    return (
-      <ChakraCheckboxCard.Root {...rest}>
-        <ChakraCheckboxCard.HiddenInput ref={ref} {...inputProps} />
-        <ChakraCheckboxCard.Control>
-          {indicatorPlacement === "start" && indicator}
-          {hasContent && (
-            <ContentWrapper>
-              {icon}
-              {label && (
-                <ChakraCheckboxCard.Label>{label}</ChakraCheckboxCard.Label>
-              )}
-              {description && (
-                <ChakraCheckboxCard.Description>
-                  {description}
-                </ChakraCheckboxCard.Description>
-              )}
-              {indicatorPlacement === "inside" && indicator}
-            </ContentWrapper>
-          )}
-          {indicatorPlacement === "end" && indicator}
-        </ChakraCheckboxCard.Control>
-        {addon && <ChakraCheckboxCard.Addon>{addon}</ChakraCheckboxCard.Addon>}
-      </ChakraCheckboxCard.Root>
-    )
-  },
-)
-
-export const CheckboxCardIndicator = ChakraCheckboxCard.Indicator
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\checkbox.tsx
-import { Checkbox as ChakraCheckbox } from "@chakra-ui/react"
-import { forwardRef } from "react"
-
-export interface CheckboxProps extends ChakraCheckbox.RootProps {
-  icon?: React.ReactNode
-  inputProps?: React.InputHTMLAttributes<HTMLInputElement>
-  rootRef?: React.Ref<HTMLLabelElement>
-}
-
-export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
-  function Checkbox(props, ref) {
-    const { icon, children, inputProps, rootRef, ...rest } = props
-    return (
-      <ChakraCheckbox.Root ref={rootRef} {...rest}>
-        <ChakraCheckbox.HiddenInput ref={ref} {...inputProps} />
-        <ChakraCheckbox.Control>
-          {icon || <ChakraCheckbox.Indicator />}
-        </ChakraCheckbox.Control>
-        {children != null && (
-          <ChakraCheckbox.Label>{children}</ChakraCheckbox.Label>
-        )}
-      </ChakraCheckbox.Root>
-    )
-  },
-)
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\clipboard.tsx
-import type { ButtonProps, InputProps } from "@chakra-ui/react"
-import {
-  Button,
-  Clipboard as ChakraClipboard,
-  IconButton,
-  Input,
-} from "@chakra-ui/react"
-import { forwardRef } from "react"
-import { LuCheck, LuClipboard, LuLink } from "react-icons/lu"
-
-const ClipboardIcon = forwardRef<
-  HTMLDivElement,
-  ChakraClipboard.IndicatorProps
->(function ClipboardIcon(props, ref) {
-  return (
-    <ChakraClipboard.Indicator copied={<LuCheck />} {...props} ref={ref}>
-      <LuClipboard />
-    </ChakraClipboard.Indicator>
-  )
-})
-
-const ClipboardCopyText = forwardRef<
-  HTMLDivElement,
-  ChakraClipboard.IndicatorProps
->(function ClipboardCopyText(props, ref) {
-  return (
-    <ChakraClipboard.Indicator copied="Copied" {...props} ref={ref}>
-      Copy
-    </ChakraClipboard.Indicator>
-  )
-})
-
-export const ClipboardLabel = forwardRef<
-  HTMLLabelElement,
-  ChakraClipboard.LabelProps
->(function ClipboardLabel(props, ref) {
-  return (
-    <ChakraClipboard.Label
-      textStyle="sm"
-      fontWeight="medium"
-      display="inline-block"
-      mb="1"
-      {...props}
-      ref={ref}
-    />
-  )
-})
-
-export const ClipboardButton = forwardRef<HTMLButtonElement, ButtonProps>(
-  function ClipboardButton(props, ref) {
-    return (
-      <ChakraClipboard.Trigger asChild>
-        <Button ref={ref} size="sm" variant="surface" {...props}>
-          <ClipboardIcon />
-          <ClipboardCopyText />
-        </Button>
-      </ChakraClipboard.Trigger>
-    )
-  },
-)
-
-export const ClipboardLink = forwardRef<HTMLButtonElement, ButtonProps>(
-  function ClipboardLink(props, ref) {
-    return (
-      <ChakraClipboard.Trigger asChild>
-        <Button
-          unstyled
-          variant="plain"
-          size="xs"
-          display="inline-flex"
-          alignItems="center"
-          gap="2"
-          ref={ref}
-          {...props}
-        >
-          <LuLink />
-          <ClipboardCopyText />
-        </Button>
-      </ChakraClipboard.Trigger>
-    )
-  },
-)
-
-export const ClipboardIconButton = forwardRef<HTMLButtonElement, ButtonProps>(
-  function ClipboardIconButton(props, ref) {
-    return (
-      <ChakraClipboard.Trigger asChild>
-        <IconButton ref={ref} size="xs" variant="subtle" {...props}>
-          <ClipboardIcon />
-          <ClipboardCopyText srOnly />
-        </IconButton>
-      </ChakraClipboard.Trigger>
-    )
-  },
-)
-
-export const ClipboardInput = forwardRef<HTMLInputElement, InputProps>(
-  function ClipboardInputElement(props, ref) {
-    return (
-      <ChakraClipboard.Input asChild>
-        <Input ref={ref} {...props} />
-      </ChakraClipboard.Input>
-    )
-  },
-)
-
-export const ClipboardRoot = ChakraClipboard.Root
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\close-button.tsx
-import type { ButtonProps as ChakraCloseButtonProps } from "@chakra-ui/react"
-import { IconButton as ChakraIconButton } from "@chakra-ui/react"
-import { forwardRef } from "react"
-import { LuX } from "react-icons/lu"
-
-export interface CloseButtonProps extends ChakraCloseButtonProps {}
-
-export const CloseButton = forwardRef<HTMLButtonElement, CloseButtonProps>(
-  function CloseButton(props, ref) {
-    return (
-      <ChakraIconButton variant="ghost" aria-label="Close" ref={ref} {...props}>
-        {props.children ?? <LuX />}
-      </ChakraIconButton>
-    )
-  },
-)
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\color-mode.tsx
-"use client"
-
-import type { IconButtonProps } from "@chakra-ui/react"
-import { ClientOnly, IconButton, Skeleton } from "@chakra-ui/react"
-import { ThemeProvider, useTheme } from "next-themes"
-import type { ThemeProviderProps } from "next-themes"
-import { forwardRef } from "react"
-import { LuMoon, LuSun } from "react-icons/lu"
-
-export interface ColorModeProviderProps extends ThemeProviderProps {}
-
-export function ColorModeProvider(props: ColorModeProviderProps) {
-  return (
-    <ThemeProvider attribute="class" disableTransitionOnChange {...props} />
-  )
-}
-
-export function useColorMode() {
-  const { resolvedTheme, setTheme } = useTheme()
-  const toggleColorMode = () => {
-    setTheme(resolvedTheme === "light" ? "dark" : "light")
-  }
-  return {
-    colorMode: resolvedTheme,
-    setColorMode: setTheme,
-    toggleColorMode,
-  }
-}
-
-export function useColorModeValue<T>(light: T, dark: T) {
-  const { colorMode } = useColorMode()
-  return colorMode === "light" ? light : dark
-}
-
-export function ColorModeIcon() {
-  const { colorMode } = useColorMode()
-  return colorMode === "light" ? <LuSun /> : <LuMoon />
-}
-
-interface ColorModeButtonProps extends Omit<IconButtonProps, "aria-label"> {}
-
-export const ColorModeButton = forwardRef<
-  HTMLButtonElement,
-  ColorModeButtonProps
->(function ColorModeButton(props, ref) {
-  const { toggleColorMode } = useColorMode()
-  return (
-    <ClientOnly fallback={<Skeleton boxSize="8" />}>
-      <IconButton
-        onClick={toggleColorMode}
-        variant="ghost"
-        aria-label="Toggle color mode"
-        size="sm"
-        ref={ref}
-        {...props}
-        css={{
-          _icon: {
-            width: "5",
-            height: "5",
-          },
-        }}
-      >
-        <ColorModeIcon />
-      </IconButton>
-    </ClientOnly>
-  )
-})
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\data-list.tsx
-import { DataList as ChakraDataList, IconButton } from "@chakra-ui/react"
-import { ToggleTip } from "./toggle-tip"
-import { forwardRef } from "react"
-import { HiOutlineInformationCircle } from "react-icons/hi2"
-
-export const DataListRoot = ChakraDataList.Root
-
-interface ItemProps extends ChakraDataList.ItemProps {
-  label: React.ReactNode
-  value: React.ReactNode
-  info?: React.ReactNode
-  grow?: boolean
-}
-
-export const DataListItem = forwardRef<HTMLDivElement, ItemProps>(
-  function DataListItem(props, ref) {
-    const { label, info, value, children, grow, ...rest } = props
-    return (
-      <ChakraDataList.Item ref={ref} {...rest}>
-        <ChakraDataList.ItemLabel flex={grow ? "1" : undefined}>
-          {label}
-          {info && (
-            <ToggleTip content={info}>
-              <IconButton variant="ghost" aria-label="info" size="2xs">
-                <HiOutlineInformationCircle />
-              </IconButton>
-            </ToggleTip>
-          )}
-        </ChakraDataList.ItemLabel>
-        <ChakraDataList.ItemValue flex={grow ? "1" : undefined}>
-          {value}
-        </ChakraDataList.ItemValue>
-        {children}
-      </ChakraDataList.Item>
-    )
-  },
-)
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\dialog.tsx
-import { Dialog as ChakraDialog, Portal } from "@chakra-ui/react"
-import { CloseButton } from "./close-button"
-import { forwardRef } from "react"
-
-interface DialogContentProps extends ChakraDialog.ContentProps {
-  portalled?: boolean
-  portalRef?: React.RefObject<HTMLElement>
-  backdrop?: boolean
-}
-
-export const DialogContent = forwardRef<HTMLDivElement, DialogContentProps>(
-  function DialogContent(props, ref) {
-    const {
-      children,
-      portalled = true,
-      portalRef,
-      backdrop = true,
-      ...rest
-    } = props
-
-    return (
-      <Portal disabled={!portalled} container={portalRef}>
-        {backdrop && <ChakraDialog.Backdrop />}
-        <ChakraDialog.Positioner>
-          <ChakraDialog.Content ref={ref} {...rest} asChild={false}>
-            {children}
-          </ChakraDialog.Content>
-        </ChakraDialog.Positioner>
-      </Portal>
-    )
-  },
-)
-
-export const DialogCloseTrigger = forwardRef<
-  HTMLButtonElement,
-  ChakraDialog.CloseTriggerProps
->(function DialogCloseTrigger(props, ref) {
-  return (
-    <ChakraDialog.CloseTrigger
-      position="absolute"
-      top="2"
-      insetEnd="2"
-      {...props}
-      asChild
-    >
-      <CloseButton size="sm" ref={ref}>
-        {props.children}
-      </CloseButton>
-    </ChakraDialog.CloseTrigger>
-  )
-})
-
-export const DialogRoot = ChakraDialog.Root
-export const DialogFooter = ChakraDialog.Footer
-export const DialogHeader = ChakraDialog.Header
-export const DialogBody = ChakraDialog.Body
-export const DialogBackdrop = ChakraDialog.Backdrop
-export const DialogTitle = ChakraDialog.Title
-export const DialogDescription = ChakraDialog.Description
-export const DialogTrigger = ChakraDialog.Trigger
-export const DialogActionTrigger = ChakraDialog.ActionTrigger
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\drawer.tsx
-import { Drawer as ChakraDrawer, Portal } from "@chakra-ui/react"
-import { CloseButton } from "./close-button"
-import { forwardRef } from "react"
-
-interface DrawerContentProps extends ChakraDrawer.ContentProps {
-  portalled?: boolean
-  portalRef?: React.RefObject<HTMLElement>
-  offset?: ChakraDrawer.ContentProps["padding"]
-}
-
-export const DrawerContent = forwardRef<HTMLDivElement, DrawerContentProps>(
-  function DrawerContent(props, ref) {
-    const { children, portalled = true, portalRef, offset, ...rest } = props
-    return (
-      <Portal disabled={!portalled} container={portalRef}>
-        <ChakraDrawer.Positioner padding={offset}>
-          <ChakraDrawer.Content ref={ref} {...rest} asChild={false}>
-            {children}
-          </ChakraDrawer.Content>
-        </ChakraDrawer.Positioner>
-      </Portal>
-    )
-  },
-)
-
-export const DrawerCloseTrigger = forwardRef<
-  HTMLButtonElement,
-  ChakraDrawer.CloseTriggerProps
->(function DrawerCloseTrigger(props, ref) {
-  return (
-    <ChakraDrawer.CloseTrigger
-      position="absolute"
-      top="2"
-      insetEnd="2"
-      {...props}
-      asChild
-    >
-      <CloseButton size="sm" ref={ref} />
-    </ChakraDrawer.CloseTrigger>
-  )
-})
-
-export const DrawerTrigger = ChakraDrawer.Trigger
-export const DrawerRoot = ChakraDrawer.Root
-export const DrawerFooter = ChakraDrawer.Footer
-export const DrawerHeader = ChakraDrawer.Header
-export const DrawerBody = ChakraDrawer.Body
-export const DrawerBackdrop = ChakraDrawer.Backdrop
-export const DrawerDescription = ChakraDrawer.Description
-export const DrawerTitle = ChakraDrawer.Title
-export const DrawerActionTrigger = ChakraDrawer.ActionTrigger
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\empty-state.tsx
-import { EmptyState as ChakraEmptyState, VStack } from "@chakra-ui/react"
-import { forwardRef } from "react"
-
-export interface EmptyStateProps extends ChakraEmptyState.RootProps {
-  title: string
-  description?: string
-  icon?: React.ReactNode
-}
-
-export const EmptyState = forwardRef<HTMLDivElement, EmptyStateProps>(
-  function EmptyState(props, ref) {
-    const { title, description, icon, children, ...rest } = props
-    return (
-      <ChakraEmptyState.Root ref={ref} {...rest}>
-        <ChakraEmptyState.Content>
-          {icon && (
-            <ChakraEmptyState.Indicator>{icon}</ChakraEmptyState.Indicator>
-          )}
-          {description ? (
-            <VStack textAlign="center">
-              <ChakraEmptyState.Title>{title}</ChakraEmptyState.Title>
-              <ChakraEmptyState.Description>
-                {description}
-              </ChakraEmptyState.Description>
-            </VStack>
-          ) : (
-            <ChakraEmptyState.Title>{title}</ChakraEmptyState.Title>
-          )}
-          {children}
-        </ChakraEmptyState.Content>
-      </ChakraEmptyState.Root>
-    )
-  },
-)
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\field.tsx
-import { Field as ChakraField } from "@chakra-ui/react"
-import { forwardRef } from "react"
-
-export interface FieldProps extends Omit<ChakraField.RootProps, "label"> {
-  label?: React.ReactNode
-  helperText?: React.ReactNode
-  errorText?: React.ReactNode
-  optionalText?: React.ReactNode
-}
-
-export const Field = forwardRef<HTMLDivElement, FieldProps>(
-  function Field(props, ref) {
-    const { label, children, helperText, errorText, optionalText, ...rest } =
-      props
-    return (
-      <ChakraField.Root ref={ref} {...rest}>
-        {label && (
-          <ChakraField.Label>
-            {label}
-            <ChakraField.RequiredIndicator fallback={optionalText} />
-          </ChakraField.Label>
-        )}
-        {children}
-        {helperText && (
-          <ChakraField.HelperText>{helperText}</ChakraField.HelperText>
-        )}
-        {errorText && (
-          <ChakraField.ErrorText>{errorText}</ChakraField.ErrorText>
-        )}
-      </ChakraField.Root>
-    )
-  },
-)
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\file-button.tsx
-"use client"
-
-import type { ButtonProps, RecipeProps } from "@chakra-ui/react"
-import {
-  Button,
-  FileUpload as ChakraFileUpload,
-  Icon,
-  IconButton,
-  Span,
-  Text,
-  useFileUploadContext,
-  useRecipe,
-} from "@chakra-ui/react"
-import { forwardRef } from "react"
-import { LuFile, LuUpload, LuX } from "react-icons/lu"
-
-export interface FileUploadRootProps extends ChakraFileUpload.RootProps {
-  inputProps?: React.InputHTMLAttributes<HTMLInputElement>
-}
-
-export const FileUploadRoot = forwardRef<HTMLInputElement, FileUploadRootProps>(
-  function FileUploadRoot(props, ref) {
-    const { children, inputProps, ...rest } = props
-    return (
-      <ChakraFileUpload.Root {...rest}>
-        <ChakraFileUpload.HiddenInput ref={ref} {...inputProps} />
-        {children}
-      </ChakraFileUpload.Root>
-    )
-  },
-)
-
-export interface FileUploadDropzoneProps
-  extends ChakraFileUpload.DropzoneProps {
-  label: React.ReactNode
-  description?: React.ReactNode
-}
-
-export const FileUploadDropzone = forwardRef<
-  HTMLInputElement,
-  FileUploadDropzoneProps
->(function FileUploadDropzone(props, ref) {
-  const { children, label, description, ...rest } = props
-  return (
-    <ChakraFileUpload.Dropzone ref={ref} {...rest}>
-      <Icon fontSize="xl" color="fg.muted">
-        <LuUpload />
-      </Icon>
-      <ChakraFileUpload.DropzoneContent>
-        <div>{label}</div>
-        {description && <Text color="fg.muted">{description}</Text>}
-      </ChakraFileUpload.DropzoneContent>
-      {children}
-    </ChakraFileUpload.Dropzone>
-  )
-})
-
-interface VisibilityProps {
-  showSize?: boolean
-  clearable?: boolean
-}
-
-interface FileUploadItemProps extends VisibilityProps {
-  file: File
-}
-
-const FileUploadItem = (props: FileUploadItemProps) => {
-  const { file, showSize, clearable } = props
-  return (
-    <ChakraFileUpload.Item file={file}>
-      <ChakraFileUpload.ItemPreview asChild>
-        <Icon fontSize="lg" color="fg.muted">
-          <LuFile />
-        </Icon>
-      </ChakraFileUpload.ItemPreview>
-
-      {showSize ? (
-        <ChakraFileUpload.ItemContent>
-          <ChakraFileUpload.ItemName />
-          <ChakraFileUpload.ItemSizeText />
-        </ChakraFileUpload.ItemContent>
-      ) : (
-        <ChakraFileUpload.ItemName flex="1" />
-      )}
-
-      {clearable && (
-        <ChakraFileUpload.ItemDeleteTrigger asChild>
-          <IconButton variant="ghost" color="fg.muted" size="xs">
-            <LuX />
-          </IconButton>
-        </ChakraFileUpload.ItemDeleteTrigger>
-      )}
-    </ChakraFileUpload.Item>
-  )
-}
-
-interface FileUploadListProps
-  extends VisibilityProps,
-    ChakraFileUpload.ItemGroupProps {
-  files?: File[]
-}
-
-export const FileUploadList = forwardRef<HTMLUListElement, FileUploadListProps>(
-  function FileUploadList(props, ref) {
-    const { showSize, clearable, files, ...rest } = props
-
-    const fileUpload = useFileUploadContext()
-    const acceptedFiles = files ?? fileUpload.acceptedFiles
-
-    if (acceptedFiles.length === 0) return null
-
-    return (
-      <ChakraFileUpload.ItemGroup ref={ref} {...rest}>
-        {acceptedFiles.map((file) => (
-          <FileUploadItem
-            key={file.name}
-            file={file}
-            showSize={showSize}
-            clearable={clearable}
-          />
-        ))}
-      </ChakraFileUpload.ItemGroup>
-    )
-  },
-)
-
-type Assign<T, U> = Omit<T, keyof U> & U
-
-interface FileInputProps extends Assign<ButtonProps, RecipeProps<"input">> {
-  placeholder?: React.ReactNode
-}
-
-export const FileInput = forwardRef<HTMLButtonElement, FileInputProps>(
-  function FileInput(props, ref) {
-    const inputRecipe = useRecipe({ key: "input" })
-    const [recipeProps, restProps] = inputRecipe.splitVariantProps(props)
-    const { placeholder = "Select file(s)", ...rest } = restProps
-    return (
-      <ChakraFileUpload.Trigger asChild>
-        <Button
-          unstyled
-          py="0"
-          ref={ref}
-          {...rest}
-          css={[inputRecipe(recipeProps), props.css]}
-        >
-          <ChakraFileUpload.Context>
-            {({ acceptedFiles }) => {
-              if (acceptedFiles.length === 1) {
-                return <span>{acceptedFiles[0].name}</span>
-              }
-              if (acceptedFiles.length > 1) {
-                return <span>{acceptedFiles.length} files</span>
-              }
-              return <Span color="fg.subtle">{placeholder}</Span>
-            }}
-          </ChakraFileUpload.Context>
-        </Button>
-      </ChakraFileUpload.Trigger>
-    )
-  },
-)
-
-export const FileUploadLabel = ChakraFileUpload.Label
-export const FileUploadClearTrigger = ChakraFileUpload.ClearTrigger
-export const FileUploadTrigger = ChakraFileUpload.Trigger
-
-
-
 // File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\Grid.tsx
 // components/ui/Grid.tsx
 "use client";
@@ -1096,310 +52,7 @@ export default GameGrid;
 
 
 
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\hover-card.tsx
-import { HoverCard, Portal } from "@chakra-ui/react"
-import { forwardRef } from "react"
-
-interface HoverCardContentProps extends HoverCard.ContentProps {
-  portalled?: boolean
-  portalRef?: React.RefObject<HTMLElement>
-}
-
-export const HoverCardContent = forwardRef<
-  HTMLDivElement,
-  HoverCardContentProps
->(function HoverCardContent(props, ref) {
-  const { portalled = true, portalRef, ...rest } = props
-
-  return (
-    <Portal disabled={!portalled} container={portalRef}>
-      <HoverCard.Positioner>
-        <HoverCard.Content ref={ref} {...rest} />
-      </HoverCard.Positioner>
-    </Portal>
-  )
-})
-
-export const HoverCardArrow = forwardRef<HTMLDivElement, HoverCard.ArrowProps>(
-  function HoverCardArrow(props, ref) {
-    return (
-      <HoverCard.Arrow ref={ref} {...props}>
-        <HoverCard.ArrowTip />
-      </HoverCard.Arrow>
-    )
-  },
-)
-
-export const HoverCardRoot = HoverCard.Root
-export const HoverCardTrigger = HoverCard.Trigger
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\input-group.tsx
-import type { BoxProps, InputElementProps } from "@chakra-ui/react"
-import { Group, InputElement } from "@chakra-ui/react"
-import { cloneElement, forwardRef } from "react"
-
-export interface InputGroupProps extends BoxProps {
-  startElementProps?: InputElementProps
-  endElementProps?: InputElementProps
-  startElement?: React.ReactNode
-  endElement?: React.ReactNode
-  children: React.ReactElement
-}
-
-export const InputGroup = forwardRef<HTMLDivElement, InputGroupProps>(
-  function InputGroup(props, ref) {
-    const {
-      startElement,
-      startElementProps,
-      endElement,
-      endElementProps,
-      children,
-      ...rest
-    } = props
-
-    return (
-      <Group ref={ref} {...rest}>
-        {startElement && (
-          <InputElement pointerEvents="none" {...startElementProps}>
-            {startElement}
-          </InputElement>
-        )}
-        {cloneElement(children, {
-          ...(startElement && { ps: "calc(var(--input-height) - 6px)" }),
-          ...(endElement && { pe: "calc(var(--input-height) - 6px)" }),
-          ...children.props,
-        })}
-        {endElement && (
-          <InputElement placement="end" {...endElementProps}>
-            {endElement}
-          </InputElement>
-        )}
-      </Group>
-    )
-  },
-)
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\link-button.tsx
-"use client"
-
-import type { HTMLChakraProps, RecipeProps } from "@chakra-ui/react"
-import { createRecipeContext } from "@chakra-ui/react"
-
-export interface LinkButtonProps
-  extends HTMLChakraProps<"a", RecipeProps<"button">> {}
-
-const { withContext } = createRecipeContext({ key: "button" })
-
-// Replace "a" with your framework's link component
-export const LinkButton = withContext<HTMLAnchorElement, LinkButtonProps>("a")
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\menu.tsx
-"use client"
-
-import { AbsoluteCenter, Menu as ChakraMenu, Portal } from "@chakra-ui/react"
-import { forwardRef } from "react"
-import { LuCheck, LuChevronRight } from "react-icons/lu"
-
-interface MenuContentProps extends ChakraMenu.ContentProps {
-  portalled?: boolean
-  portalRef?: React.RefObject<HTMLElement>
-}
-
-export const MenuContent = forwardRef<HTMLDivElement, MenuContentProps>(
-  function MenuContent(props, ref) {
-    const { portalled = true, portalRef, ...rest } = props
-    return (
-      <Portal disabled={!portalled} container={portalRef}>
-        <ChakraMenu.Positioner>
-          <ChakraMenu.Content ref={ref} {...rest} />
-        </ChakraMenu.Positioner>
-      </Portal>
-    )
-  },
-)
-
-export const MenuArrow = forwardRef<HTMLDivElement, ChakraMenu.ArrowProps>(
-  function MenuArrow(props, ref) {
-    return (
-      <ChakraMenu.Arrow ref={ref} {...props}>
-        <ChakraMenu.ArrowTip />
-      </ChakraMenu.Arrow>
-    )
-  },
-)
-
-export const MenuCheckboxItem = forwardRef<
-  HTMLDivElement,
-  ChakraMenu.CheckboxItemProps
->(function MenuCheckboxItem(props, ref) {
-  return (
-    <ChakraMenu.CheckboxItem ref={ref} {...props}>
-      <ChakraMenu.ItemIndicator hidden={false}>
-        <LuCheck />
-      </ChakraMenu.ItemIndicator>
-      {props.children}
-    </ChakraMenu.CheckboxItem>
-  )
-})
-
-export const MenuRadioItem = forwardRef<
-  HTMLDivElement,
-  ChakraMenu.RadioItemProps
->(function MenuRadioItem(props, ref) {
-  const { children, ...rest } = props
-  return (
-    <ChakraMenu.RadioItem ps="8" ref={ref} {...rest}>
-      <AbsoluteCenter axis="horizontal" left="4" asChild>
-        <ChakraMenu.ItemIndicator>
-          <LuCheck />
-        </ChakraMenu.ItemIndicator>
-      </AbsoluteCenter>
-      <ChakraMenu.ItemText>{children}</ChakraMenu.ItemText>
-    </ChakraMenu.RadioItem>
-  )
-})
-
-export const MenuItemGroup = forwardRef<
-  HTMLDivElement,
-  ChakraMenu.ItemGroupProps
->(function MenuItemGroup(props, ref) {
-  const { title, children, ...rest } = props
-  return (
-    <ChakraMenu.ItemGroup ref={ref} {...rest}>
-      {title && (
-        <ChakraMenu.ItemGroupLabel userSelect="none">
-          {title}
-        </ChakraMenu.ItemGroupLabel>
-      )}
-      {children}
-    </ChakraMenu.ItemGroup>
-  )
-})
-
-export interface MenuTriggerItemProps extends ChakraMenu.ItemProps {
-  startIcon?: React.ReactNode
-}
-
-export const MenuTriggerItem = forwardRef<HTMLDivElement, MenuTriggerItemProps>(
-  function MenuTriggerItem(props, ref) {
-    const { startIcon, children, ...rest } = props
-    return (
-      <ChakraMenu.TriggerItem ref={ref} {...rest}>
-        {startIcon}
-        {children}
-        <LuChevronRight />
-      </ChakraMenu.TriggerItem>
-    )
-  },
-)
-
-export const MenuRadioItemGroup = ChakraMenu.RadioItemGroup
-export const MenuContextTrigger = ChakraMenu.ContextTrigger
-export const MenuRoot = ChakraMenu.Root
-export const MenuSeparator = ChakraMenu.Separator
-
-export const MenuItem = ChakraMenu.Item
-export const MenuItemText = ChakraMenu.ItemText
-export const MenuItemCommand = ChakraMenu.ItemCommand
-export const MenuTrigger = ChakraMenu.Trigger
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\native-select.tsx
-"use client"
-
-import { NativeSelect as Select } from "@chakra-ui/react"
-import { forwardRef, useMemo } from "react"
-
-interface NativeSelectRootProps extends Select.RootProps {
-  icon?: React.ReactNode
-}
-
-export const NativeSelectRoot = forwardRef<
-  HTMLDivElement,
-  NativeSelectRootProps
->(function NativeSelect(props, ref) {
-  const { icon, children, ...rest } = props
-  return (
-    <Select.Root ref={ref} {...rest}>
-      {children}
-      <Select.Indicator>{icon}</Select.Indicator>
-    </Select.Root>
-  )
-})
-
-interface NativeSelectItem {
-  value: string
-  label: string
-  disabled?: boolean
-}
-
-interface NativeSelectField extends Select.FieldProps {
-  items?: Array<string | NativeSelectItem>
-}
-
-export const NativeSelectField = forwardRef<
-  HTMLSelectElement,
-  NativeSelectField
->(function NativeSelectField(props, ref) {
-  const { items: itemsProp, children, ...rest } = props
-
-  const items = useMemo(
-    () =>
-      itemsProp?.map((item) =>
-        typeof item === "string" ? { label: item, value: item } : item,
-      ),
-    [itemsProp],
-  )
-
-  return (
-    <Select.Field ref={ref} {...rest}>
-      {children}
-      {items?.map((item) => (
-        <option key={item.value} value={item.value} disabled={item.disabled}>
-          {item.label}
-        </option>
-      ))}
-    </Select.Field>
-  )
-})
-
-
-
 // File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\Navbar.tsx
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\number-input.tsx
-import { NumberInput as ChakraNumberInput } from "@chakra-ui/react"
-import { forwardRef } from "react"
-
-export interface NumberInputProps extends ChakraNumberInput.RootProps {}
-
-export const NumberInputRoot = forwardRef<HTMLDivElement, NumberInputProps>(
-  function NumberInput(props, ref) {
-    const { children, ...rest } = props
-    return (
-      <ChakraNumberInput.Root ref={ref} variant="outline" {...rest}>
-        {children}
-        <ChakraNumberInput.Control>
-          <ChakraNumberInput.IncrementTrigger />
-          <ChakraNumberInput.DecrementTrigger />
-        </ChakraNumberInput.Control>
-      </ChakraNumberInput.Root>
-    )
-  },
-)
-
-export const NumberInputField = ChakraNumberInput.Input
-export const NumberInputScruber = ChakraNumberInput.Scrubber
-export const NumberInputLabel = ChakraNumberInput.Label
 
 
 
@@ -1475,1307 +128,117 @@ export default OnlineUsers;
 "use client";
 import { useEffect, useState, useContext } from "react";
 
-import { Box, VStack, Text, Heading } from "@chakra-ui/react";
+import { Box, VStack, Text, Heading, HStack, Button } from "@chakra-ui/react";
 import { SocketContext } from "../ui/SocketProvider";
+import { Toaster, toaster } from "../chakra/toaster";
+interface OnlineUserProps {
+  onlineUsers: string[];
+  handleInvite: (username: string) => void; // Add handleInvite prop
+}
 
-const OnlineUserList: React.FC = () => {
+const OnlineUsersList: React.FC<OnlineUserProps> = ({ handleInvite }) => {
   const { socket } = useContext(SocketContext);
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
-
+  const handleInviteClick = (userToInvite: string) => {
+    // console.log("Inviting user:", userToInvite);
+    handleInvite(userToInvite); // Call the provided handleInvite function
+  };
   useEffect(() => {
     if (socket) {
       socket.on("connect", () => {
         socket.emit("getOnlineUsers"); // Get initial user list
       });
+      socket.on("inviteSent", (data: any) => {
+        if (data.success) {
+          toaster.create({
+            title: `Invite sent to ${data.to}`,
 
+            type: "success",
+            duration: 3000,
+          });
+        } else if (data.error) {
+          toaster.create({
+            title: data.error,
+            type: "error",
+            duration: 3000,
+          });
+        }
+      });
       socket.on("updateUserList", (users: any) => {
         setOnlineUsers(users);
       });
 
       return () => {
         socket.off("connect");
+        socket.off("invitesent");
         socket.off("updateUserList");
       };
     }
-  }, [socket]);
+  }, [socket, toaster]);
+
+  if (!socket)
+    return (
+      <>
+        {" "}
+        <Text>no socket detected yet</Text>
+      </>
+    );
 
   return (
-    <Box>
-      <VStack rowGap={4} align="center">
-        <Heading as="h2" size="lg">
-          Online Users
-        </Heading>
+    <>
+      {/* <Box>
+        <VStack rowGap={4} align="center">
+          <Heading as="h2" size="lg">
+            Online Users
+          </Heading>
 
-        <VStack rowGap={2} align="start">
-          {onlineUsers.length > 0 ? (
-            onlineUsers.map((user) => <Text key={user}>{user}</Text>)
-          ) : (
-            <Text>No users online</Text>
-          )}
+          <VStack rowGap={2} align="start">
+            {onlineUsers.length > 0 ? (
+              onlineUsers.map((user) => <Text key={user}>{user}</Text>)
+            ) : (
+              <Text>No users online</Text>
+            )}
+          </VStack>
         </VStack>
-      </VStack>
-    </Box>
+      </Box> */}
+      <Box>
+        <VStack rowGap={4} align="center">
+          <Heading as="h2" size="lg">
+            Online Users
+          </Heading>
+
+          <VStack rowGap={2} align="start">
+            {onlineUsers.length > 0 ? (
+              onlineUsers.map((user) => (
+                <HStack key={user} justifyContent="space-between" width="200px">
+                  <Text>{user}</Text>
+
+                  <Button
+                    onClick={() => handleInviteClick(user)} // Pass the user to invite
+                    disabled={user === localStorage.getItem("username")} // Disable if inviting self
+                    size="xs"
+                    className="bg-white text-black px-2"
+                  >
+                    Invite
+                  </Button>
+                </HStack>
+              ))
+            ) : (
+              <Text>No other users online</Text>
+            )}
+          </VStack>
+        </VStack>
+      </Box>
+    </>
   );
 };
 
-export default OnlineUserList;
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\pagination.tsx
-"use client"
-
-import type { ButtonProps, TextProps } from "@chakra-ui/react"
-import {
-  Button,
-  Pagination as ChakraPagination,
-  IconButton,
-  Text,
-  createContext,
-  usePaginationContext,
-} from "@chakra-ui/react"
-import { forwardRef, useMemo } from "react"
-import {
-  HiChevronLeft,
-  HiChevronRight,
-  HiMiniEllipsisHorizontal,
-} from "react-icons/hi2"
-import { LinkButton } from "./link-button"
-
-interface ButtonVariantMap {
-  current: ButtonProps["variant"]
-  default: ButtonProps["variant"]
-  ellipsis: ButtonProps["variant"]
-}
-
-type PaginationVariant = "outline" | "solid" | "subtle"
-
-interface ButtonVariantContext {
-  size: ButtonProps["size"]
-  variantMap: ButtonVariantMap
-  getHref?: (page: number) => string
-}
-
-const [RootPropsProvider, useRootProps] = createContext<ButtonVariantContext>({
-  name: "RootPropsProvider",
-})
-
-export interface PaginationRootProps
-  extends Omit<ChakraPagination.RootProps, "type"> {
-  size?: ButtonProps["size"]
-  variant?: PaginationVariant
-  getHref?: (page: number) => string
-}
-
-const variantMap: Record<PaginationVariant, ButtonVariantMap> = {
-  outline: { default: "ghost", ellipsis: "plain", current: "outline" },
-  solid: { default: "outline", ellipsis: "outline", current: "solid" },
-  subtle: { default: "ghost", ellipsis: "plain", current: "subtle" },
-}
-
-export const PaginationRoot = forwardRef<HTMLDivElement, PaginationRootProps>(
-  function PaginationRoot(props, ref) {
-    const { size = "sm", variant = "outline", getHref, ...rest } = props
-    return (
-      <RootPropsProvider
-        value={{ size, variantMap: variantMap[variant], getHref }}
-      >
-        <ChakraPagination.Root
-          ref={ref}
-          type={getHref ? "link" : "button"}
-          {...rest}
-        />
-      </RootPropsProvider>
-    )
-  },
-)
-
-export const PaginationEllipsis = forwardRef<
-  HTMLDivElement,
-  ChakraPagination.EllipsisProps
->(function PaginationEllipsis(props, ref) {
-  const { size, variantMap } = useRootProps()
-  return (
-    <ChakraPagination.Ellipsis ref={ref} {...props} asChild>
-      <Button as="span" variant={variantMap.ellipsis} size={size}>
-        <HiMiniEllipsisHorizontal />
-      </Button>
-    </ChakraPagination.Ellipsis>
-  )
-})
-
-export const PaginationItem = forwardRef<
-  HTMLButtonElement,
-  ChakraPagination.ItemProps
->(function PaginationItem(props, ref) {
-  const { page } = usePaginationContext()
-  const { size, variantMap, getHref } = useRootProps()
-
-  const current = page === props.value
-  const variant = current ? variantMap.current : variantMap.default
-
-  if (getHref) {
-    return (
-      <LinkButton href={getHref(props.value)} variant={variant} size={size}>
-        {props.value}
-      </LinkButton>
-    )
-  }
-
-  return (
-    <ChakraPagination.Item ref={ref} {...props} asChild>
-      <Button variant={variant} size={size}>
-        {props.value}
-      </Button>
-    </ChakraPagination.Item>
-  )
-})
-
-export const PaginationPrevTrigger = forwardRef<
-  HTMLButtonElement,
-  ChakraPagination.PrevTriggerProps
->(function PaginationPrevTrigger(props, ref) {
-  const { size, variantMap, getHref } = useRootProps()
-  const { previousPage } = usePaginationContext()
-
-  if (getHref) {
-    return (
-      <LinkButton
-        href={previousPage != null ? getHref(previousPage) : undefined}
-        variant={variantMap.default}
-        size={size}
-      >
-        <HiChevronLeft />
-      </LinkButton>
-    )
-  }
-
-  return (
-    <ChakraPagination.PrevTrigger ref={ref} asChild {...props}>
-      <IconButton variant={variantMap.default} size={size}>
-        <HiChevronLeft />
-      </IconButton>
-    </ChakraPagination.PrevTrigger>
-  )
-})
-
-export const PaginationNextTrigger = forwardRef<
-  HTMLButtonElement,
-  ChakraPagination.NextTriggerProps
->(function PaginationNextTrigger(props, ref) {
-  const { size, variantMap, getHref } = useRootProps()
-  const { nextPage } = usePaginationContext()
-
-  if (getHref) {
-    return (
-      <LinkButton
-        href={nextPage != null ? getHref(nextPage) : undefined}
-        variant={variantMap.default}
-        size={size}
-      >
-        <HiChevronRight />
-      </LinkButton>
-    )
-  }
-
-  return (
-    <ChakraPagination.NextTrigger ref={ref} asChild {...props}>
-      <IconButton variant={variantMap.default} size={size}>
-        <HiChevronRight />
-      </IconButton>
-    </ChakraPagination.NextTrigger>
-  )
-})
-
-export const PaginationItems = (props: React.HTMLAttributes<HTMLElement>) => {
-  return (
-    <ChakraPagination.Context>
-      {({ pages }) =>
-        pages.map((page, index) => {
-          return page.type === "ellipsis" ? (
-            <PaginationEllipsis key={index} index={index} {...props} />
-          ) : (
-            <PaginationItem
-              key={index}
-              type="page"
-              value={page.value}
-              {...props}
-            />
-          )
-        })
-      }
-    </ChakraPagination.Context>
-  )
-}
-
-interface PageTextProps extends TextProps {
-  format?: "short" | "compact" | "long"
-}
-
-export const PaginationPageText = forwardRef<
-  HTMLParagraphElement,
-  PageTextProps
->(function PaginationPageText(props, ref) {
-  const { format = "compact", ...rest } = props
-  const { page, pages, pageRange, count } = usePaginationContext()
-  const content = useMemo(() => {
-    if (format === "short") return `${page} / ${pages.length}`
-    if (format === "compact") return `${page} of ${pages.length}`
-    return `${pageRange.start + 1} - ${pageRange.end} of ${count}`
-  }, [format, page, pages.length, pageRange, count])
-
-  return (
-    <Text fontWeight="medium" ref={ref} {...rest}>
-      {content}
-    </Text>
-  )
-})
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\password-input.tsx
-"use client"
-
-import type {
-  ButtonProps,
-  GroupProps,
-  InputProps,
-  StackProps,
-} from "@chakra-ui/react"
-import {
-  Box,
-  HStack,
-  IconButton,
-  Input,
-  Stack,
-  mergeRefs,
-  useControllableState,
-} from "@chakra-ui/react"
-import { forwardRef, useRef } from "react"
-import { LuEye, LuEyeOff } from "react-icons/lu"
-import { InputGroup } from "./input-group"
-
-export interface PasswordVisibilityProps {
-  defaultVisible?: boolean
-  visible?: boolean
-  onVisibleChange?: (visible: boolean) => void
-  visibilityIcon?: { on: React.ReactNode; off: React.ReactNode }
-}
-
-export interface PasswordInputProps
-  extends InputProps,
-    PasswordVisibilityProps {
-  rootProps?: GroupProps
-}
-
-export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
-  function PasswordInput(props, ref) {
-    const {
-      rootProps,
-      defaultVisible,
-      visible: visibleProp,
-      onVisibleChange,
-      visibilityIcon = { on: <LuEye />, off: <LuEyeOff /> },
-      ...rest
-    } = props
-
-    const [visible, setVisible] = useControllableState({
-      value: visibleProp,
-      defaultValue: defaultVisible || false,
-      onChange: onVisibleChange,
-    })
-
-    const inputRef = useRef<HTMLInputElement>(null)
-
-    return (
-      <InputGroup
-        width="full"
-        endElement={
-          <VisibilityTrigger
-            disabled={rest.disabled}
-            onPointerDown={(e) => {
-              if (rest.disabled) return
-              if (e.button !== 0) return
-              e.preventDefault()
-              setVisible(!visible)
-            }}
-          >
-            {visible ? visibilityIcon.off : visibilityIcon.on}
-          </VisibilityTrigger>
-        }
-        {...rootProps}
-      >
-        <Input
-          {...rest}
-          ref={mergeRefs(ref, inputRef)}
-          type={visible ? "text" : "password"}
-        />
-      </InputGroup>
-    )
-  },
-)
-
-const VisibilityTrigger = forwardRef<HTMLButtonElement, ButtonProps>(
-  function VisibilityTrigger(props, ref) {
-    return (
-      <IconButton
-        tabIndex={-1}
-        ref={ref}
-        me="-2"
-        aspectRatio="square"
-        size="sm"
-        variant="ghost"
-        height="calc(100% - {spacing.2})"
-        aria-label="Toggle password visibility"
-        {...props}
-      />
-    )
-  },
-)
-
-interface PasswordStrengthMeterProps extends StackProps {
-  max?: number
-  value: number
-}
-
-export const PasswordStrengthMeter = forwardRef<
-  HTMLDivElement,
-  PasswordStrengthMeterProps
->(function PasswordStrengthMeter(props, ref) {
-  const { max = 4, value, ...rest } = props
-
-  const percent = (value / max) * 100
-  const { label, colorPalette } = getColorPalette(percent)
-
-  return (
-    <Stack align="flex-end" gap="1" ref={ref} {...rest}>
-      <HStack width="full" ref={ref} {...rest}>
-        {Array.from({ length: max }).map((_, index) => (
-          <Box
-            key={index}
-            height="1"
-            flex="1"
-            rounded="sm"
-            data-selected={index < value ? "" : undefined}
-            layerStyle="fill.subtle"
-            colorPalette="gray"
-            _selected={{
-              colorPalette,
-              layerStyle: "fill.solid",
-            }}
-          />
-        ))}
-      </HStack>
-      {label && <HStack textStyle="xs">{label}</HStack>}
-    </Stack>
-  )
-})
-
-function getColorPalette(percent: number) {
-  switch (true) {
-    case percent < 33:
-      return { label: "Low", colorPalette: "red" }
-    case percent < 66:
-      return { label: "Medium", colorPalette: "orange" }
-    default:
-      return { label: "High", colorPalette: "green" }
-  }
-}
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\pin-input.tsx
-import { PinInput as ChakraPinInput, Group } from "@chakra-ui/react"
-import { forwardRef } from "react"
-
-export interface PinInputProps extends ChakraPinInput.RootProps {
-  rootRef?: React.Ref<HTMLDivElement>
-  count?: number
-  inputProps?: React.InputHTMLAttributes<HTMLInputElement>
-  attached?: boolean
-}
-
-export const PinInput = forwardRef<HTMLInputElement, PinInputProps>(
-  function PinInput(props, ref) {
-    const { count = 4, inputProps, rootRef, attached, ...rest } = props
-    return (
-      <ChakraPinInput.Root ref={rootRef} {...rest}>
-        <ChakraPinInput.HiddenInput ref={ref} {...inputProps} />
-        <ChakraPinInput.Control>
-          <Group attached={attached}>
-            {Array.from({ length: count }).map((_, index) => (
-              <ChakraPinInput.Input key={index} index={index} />
-            ))}
-          </Group>
-        </ChakraPinInput.Control>
-      </ChakraPinInput.Root>
-    )
-  },
-)
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\popover.tsx
-import { Popover as ChakraPopover, Portal } from "@chakra-ui/react"
-import { CloseButton } from "./close-button"
-import { forwardRef } from "react"
-
-interface PopoverContentProps extends ChakraPopover.ContentProps {
-  portalled?: boolean
-  portalRef?: React.RefObject<HTMLElement>
-}
-
-export const PopoverContent = forwardRef<HTMLDivElement, PopoverContentProps>(
-  function PopoverContent(props, ref) {
-    const { portalled = true, portalRef, ...rest } = props
-    return (
-      <Portal disabled={!portalled} container={portalRef}>
-        <ChakraPopover.Positioner>
-          <ChakraPopover.Content ref={ref} {...rest} />
-        </ChakraPopover.Positioner>
-      </Portal>
-    )
-  },
-)
-
-export const PopoverArrow = forwardRef<
-  HTMLDivElement,
-  ChakraPopover.ArrowProps
->(function PopoverArrow(props, ref) {
-  return (
-    <ChakraPopover.Arrow {...props} ref={ref}>
-      <ChakraPopover.ArrowTip />
-    </ChakraPopover.Arrow>
-  )
-})
-
-export const PopoverCloseTrigger = forwardRef<
-  HTMLButtonElement,
-  ChakraPopover.CloseTriggerProps
->(function PopoverCloseTrigger(props, ref) {
-  return (
-    <ChakraPopover.CloseTrigger
-      position="absolute"
-      top="1"
-      insetEnd="1"
-      {...props}
-      asChild
-      ref={ref}
-    >
-      <CloseButton size="sm" />
-    </ChakraPopover.CloseTrigger>
-  )
-})
-
-export const PopoverTitle = ChakraPopover.Title
-export const PopoverDescription = ChakraPopover.Description
-export const PopoverFooter = ChakraPopover.Footer
-export const PopoverHeader = ChakraPopover.Header
-export const PopoverRoot = ChakraPopover.Root
-export const PopoverBody = ChakraPopover.Body
-export const PopoverTrigger = ChakraPopover.Trigger
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\progress-circle.tsx
-import type { SystemStyleObject } from "@chakra-ui/react"
-import {
-  AbsoluteCenter,
-  ProgressCircle as ChakraProgressCircle,
-} from "@chakra-ui/react"
-import { forwardRef } from "react"
-
-export const ProgressCircleRoot = ChakraProgressCircle.Root
-
-interface ProgressCircleRingProps extends ChakraProgressCircle.CircleProps {
-  trackColor?: SystemStyleObject["stroke"]
-  cap?: SystemStyleObject["strokeLinecap"]
-}
-
-export const ProgressCircleRing = forwardRef<
-  SVGSVGElement,
-  ProgressCircleRingProps
->(function ProgressCircleRing(props, ref) {
-  const { trackColor, cap, color, ...rest } = props
-  return (
-    <ChakraProgressCircle.Circle {...rest} ref={ref}>
-      <ChakraProgressCircle.Track stroke={trackColor} />
-      <ChakraProgressCircle.Range stroke={color} strokeLinecap={cap} />
-    </ChakraProgressCircle.Circle>
-  )
-})
-
-export const ProgressCircleValueText = forwardRef<
-  HTMLDivElement,
-  ChakraProgressCircle.ValueTextProps
->(function ProgressCircleValueText(props, ref) {
-  return (
-    <AbsoluteCenter>
-      <ChakraProgressCircle.ValueText {...props} ref={ref} />
-    </AbsoluteCenter>
-  )
-})
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\progress.tsx
-import { Progress as ChakraProgress, IconButton } from "@chakra-ui/react"
-import { ToggleTip } from "./toggle-tip"
-import { forwardRef } from "react"
-import { HiOutlineInformationCircle } from "react-icons/hi"
-
-export const ProgressBar = forwardRef<
-  HTMLDivElement,
-  ChakraProgress.TrackProps
->(function ProgressBar(props, ref) {
-  return (
-    <ChakraProgress.Track {...props} ref={ref}>
-      <ChakraProgress.Range />
-    </ChakraProgress.Track>
-  )
-})
-
-export const ProgressRoot = ChakraProgress.Root
-export const ProgressValueText = ChakraProgress.ValueText
-
-export interface ProgressLabelProps extends ChakraProgress.LabelProps {
-  info?: React.ReactNode
-}
-
-export const ProgressLabel = forwardRef<HTMLDivElement, ProgressLabelProps>(
-  function ProgressLabel(props, ref) {
-    const { children, info, ...rest } = props
-    return (
-      <ChakraProgress.Label {...rest} ref={ref}>
-        {children}
-        {info && (
-          <ToggleTip content={info}>
-            <IconButton variant="ghost" aria-label="info" size="2xs" ms="1">
-              <HiOutlineInformationCircle />
-            </IconButton>
-          </ToggleTip>
-        )}
-      </ChakraProgress.Label>
-    )
-  },
-)
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\prose.tsx
-"use client"
-
-import { chakra } from "@chakra-ui/react"
-
-export const Prose = chakra("div", {
-  base: {
-    color: "fg.muted",
-    maxWidth: "65ch",
-    fontSize: "sm",
-    lineHeight: "1.7em",
-    "& p": {
-      marginTop: "1em",
-      marginBottom: "1em",
-    },
-    "& blockquote": {
-      marginTop: "1.285em",
-      marginBottom: "1.285em",
-      paddingInline: "1.285em",
-      borderInlineStartWidth: "0.25em",
-    },
-    "& a": {
-      color: "fg",
-      textDecoration: "underline",
-      textUnderlineOffset: "3px",
-      textDecorationThickness: "2px",
-      textDecorationColor: "border.muted",
-      fontWeight: "500",
-    },
-    "& strong": {
-      fontWeight: "600",
-    },
-    "& a strong": {
-      color: "inherit",
-    },
-    "& h1": {
-      fontSize: "2.15em",
-      letterSpacing: "-0.02em",
-      marginTop: "0",
-      marginBottom: "0.8em",
-      lineHeight: "1.2em",
-    },
-    "& h2": {
-      fontSize: "1.4em",
-      letterSpacing: "-0.02em",
-      marginTop: "1.6em",
-      marginBottom: "0.8em",
-      lineHeight: "1.4em",
-    },
-    "& h3": {
-      fontSize: "1.285em",
-      letterSpacing: "-0.01em",
-      marginTop: "1.5em",
-      marginBottom: "0.4em",
-      lineHeight: "1.5em",
-    },
-    "& h4": {
-      marginTop: "1.4em",
-      marginBottom: "0.5em",
-      letterSpacing: "-0.01em",
-      lineHeight: "1.5em",
-    },
-    "& img": {
-      marginTop: "1.7em",
-      marginBottom: "1.7em",
-      borderRadius: "lg",
-      boxShadow: "inset",
-    },
-    "& picture": {
-      marginTop: "1.7em",
-      marginBottom: "1.7em",
-    },
-    "& picture > img": {
-      marginTop: "0",
-      marginBottom: "0",
-    },
-    "& video": {
-      marginTop: "1.7em",
-      marginBottom: "1.7em",
-    },
-    "& kbd": {
-      fontSize: "0.85em",
-      borderRadius: "xs",
-      paddingTop: "0.15em",
-      paddingBottom: "0.15em",
-      paddingInlineEnd: "0.35em",
-      paddingInlineStart: "0.35em",
-      fontFamily: "inherit",
-      color: "fg.muted",
-      "--shadow": "colors.border",
-      boxShadow: "0 0 0 1px var(--shadow),0 1px 0 1px var(--shadow)",
-    },
-    "& code": {
-      fontSize: "0.925em",
-      letterSpacing: "-0.01em",
-      borderRadius: "md",
-      borderWidth: "1px",
-      padding: "0.25em",
-    },
-    "& pre code": {
-      fontSize: "inherit",
-      letterSpacing: "inherit",
-      borderWidth: "inherit",
-      padding: "0",
-    },
-    "& h2 code": {
-      fontSize: "0.9em",
-    },
-    "& h3 code": {
-      fontSize: "0.8em",
-    },
-    "& pre": {
-      backgroundColor: "bg.subtle",
-      marginTop: "1.6em",
-      marginBottom: "1.6em",
-      borderRadius: "md",
-      fontSize: "0.9em",
-      paddingTop: "0.65em",
-      paddingBottom: "0.65em",
-      paddingInlineEnd: "1em",
-      paddingInlineStart: "1em",
-      overflowX: "auto",
-      fontWeight: "400",
-    },
-    "& ol": {
-      marginTop: "1em",
-      marginBottom: "1em",
-      paddingInlineStart: "1.5em",
-    },
-    "& ul": {
-      marginTop: "1em",
-      marginBottom: "1em",
-      paddingInlineStart: "1.5em",
-    },
-    "& li": {
-      marginTop: "0.285em",
-      marginBottom: "0.285em",
-    },
-    "& ol > li": {
-      paddingInlineStart: "0.4em",
-      listStyleType: "decimal",
-      "&::marker": {
-        color: "fg.muted",
-      },
-    },
-    "& ul > li": {
-      paddingInlineStart: "0.4em",
-      listStyleType: "disc",
-      "&::marker": {
-        color: "fg.muted",
-      },
-    },
-    "& > ul > li p": {
-      marginTop: "0.5em",
-      marginBottom: "0.5em",
-    },
-    "& > ul > li > p:first-of-type": {
-      marginTop: "1em",
-    },
-    "& > ul > li > p:last-of-type": {
-      marginBottom: "1em",
-    },
-    "& > ol > li > p:first-of-type": {
-      marginTop: "1em",
-    },
-    "& > ol > li > p:last-of-type": {
-      marginBottom: "1em",
-    },
-    "& ul ul, ul ol, ol ul, ol ol": {
-      marginTop: "0.5em",
-      marginBottom: "0.5em",
-    },
-    "& dl": {
-      marginTop: "1em",
-      marginBottom: "1em",
-    },
-    "& dt": {
-      fontWeight: "600",
-      marginTop: "1em",
-    },
-    "& dd": {
-      marginTop: "0.285em",
-      paddingInlineStart: "1.5em",
-    },
-    "& hr": {
-      marginTop: "2.25em",
-      marginBottom: "2.25em",
-    },
-    "& :is(h1,h2,h3,h4,h5,hr) + *": {
-      marginTop: "0",
-    },
-    "& table": {
-      width: "100%",
-      tableLayout: "auto",
-      textAlign: "start",
-      lineHeight: "1.5em",
-      marginTop: "2em",
-      marginBottom: "2em",
-    },
-    "& thead": {
-      borderBottomWidth: "1px",
-      color: "fg",
-    },
-    "& tbody tr": {
-      borderBottomWidth: "1px",
-      borderBottomColor: "border",
-    },
-    "& thead th": {
-      paddingInlineEnd: "1em",
-      paddingBottom: "0.65em",
-      paddingInlineStart: "1em",
-      fontWeight: "medium",
-      textAlign: "start",
-    },
-    "& thead th:first-of-type": {
-      paddingInlineStart: "0",
-    },
-    "& thead th:last-of-type": {
-      paddingInlineEnd: "0",
-    },
-    "& tbody td, tfoot td": {
-      paddingTop: "0.65em",
-      paddingInlineEnd: "1em",
-      paddingBottom: "0.65em",
-      paddingInlineStart: "1em",
-    },
-    "& tbody td:first-of-type, tfoot td:first-of-type": {
-      paddingInlineStart: "0",
-    },
-    "& tbody td:last-of-type, tfoot td:last-of-type": {
-      paddingInlineEnd: "0",
-    },
-    "& figure": {
-      marginTop: "1.625em",
-      marginBottom: "1.625em",
-    },
-    "& figure > *": {
-      marginTop: "0",
-      marginBottom: "0",
-    },
-    "& figcaption": {
-      fontSize: "0.85em",
-      lineHeight: "1.25em",
-      marginTop: "0.85em",
-      color: "fg.muted",
-    },
-    "& h1, h2, h3, h4": {
-      color: "fg",
-      fontWeight: "600",
-    },
-  },
-  variants: {
-    size: {
-      md: {
-        fontSize: "sm",
-      },
-      lg: {
-        fontSize: "md",
-      },
-    },
-  },
-  defaultVariants: {
-    size: "md",
-  },
-})
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\provider.tsx
-"use client"
-
-import { ChakraProvider, defaultSystem } from "@chakra-ui/react"
-import {
-  ColorModeProvider,
-  type ColorModeProviderProps,
-} from "./color-mode"
-
-export function Provider(props: ColorModeProviderProps) {
-  return (
-    <ChakraProvider value={defaultSystem}>
-      <ColorModeProvider {...props} />
-    </ChakraProvider>
-  )
-}
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\radio-card.tsx
-import { RadioCard } from "@chakra-ui/react"
-import { Fragment, forwardRef } from "react"
-
-interface RadioCardItemProps extends RadioCard.ItemProps {
-  icon?: React.ReactElement
-  label?: React.ReactNode
-  description?: React.ReactNode
-  addon?: React.ReactNode
-  indicator?: React.ReactNode | null
-  indicatorPlacement?: "start" | "end" | "inside"
-  inputProps?: React.InputHTMLAttributes<HTMLInputElement>
-}
-
-export const RadioCardItem = forwardRef<HTMLInputElement, RadioCardItemProps>(
-  function RadioCardItem(props, ref) {
-    const {
-      inputProps,
-      label,
-      description,
-      addon,
-      icon,
-      indicator = <RadioCard.ItemIndicator />,
-      indicatorPlacement = "end",
-      ...rest
-    } = props
-
-    const hasContent = label || description || icon
-    const ContentWrapper = indicator ? RadioCard.ItemContent : Fragment
-
-    return (
-      <RadioCard.Item {...rest}>
-        <RadioCard.ItemHiddenInput ref={ref} {...inputProps} />
-        <RadioCard.ItemControl>
-          {indicatorPlacement === "start" && indicator}
-          {hasContent && (
-            <ContentWrapper>
-              {icon}
-              {label && <RadioCard.ItemText>{label}</RadioCard.ItemText>}
-              {description && (
-                <RadioCard.ItemDescription>
-                  {description}
-                </RadioCard.ItemDescription>
-              )}
-              {indicatorPlacement === "inside" && indicator}
-            </ContentWrapper>
-          )}
-          {indicatorPlacement === "end" && indicator}
-        </RadioCard.ItemControl>
-        {addon && <RadioCard.ItemAddon>{addon}</RadioCard.ItemAddon>}
-      </RadioCard.Item>
-    )
-  },
-)
-
-export const RadioCardRoot = RadioCard.Root
-export const RadioCardLabel = RadioCard.Label
-export const RadioCardItemIndicator = RadioCard.ItemIndicator
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\radio.tsx
-import { RadioGroup as ChakraRadioGroup } from "@chakra-ui/react"
-import { forwardRef } from "react"
-
-export interface RadioProps extends ChakraRadioGroup.ItemProps {
-  rootRef?: React.Ref<HTMLDivElement>
-  inputProps?: React.InputHTMLAttributes<HTMLInputElement>
-}
-
-export const Radio = forwardRef<HTMLInputElement, RadioProps>(
-  function Radio(props, ref) {
-    const { children, inputProps, rootRef, ...rest } = props
-    return (
-      <ChakraRadioGroup.Item ref={rootRef} {...rest}>
-        <ChakraRadioGroup.ItemHiddenInput ref={ref} {...inputProps} />
-        <ChakraRadioGroup.ItemIndicator />
-        {children && (
-          <ChakraRadioGroup.ItemText>{children}</ChakraRadioGroup.ItemText>
-        )}
-      </ChakraRadioGroup.Item>
-    )
-  },
-)
-
-export const RadioGroup = ChakraRadioGroup.Root
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\rating.tsx
-import { RatingGroup } from "@chakra-ui/react"
-import { forwardRef } from "react"
-
-export interface RatingProps extends RatingGroup.RootProps {
-  icon?: React.ReactElement
-  count?: number
-  label?: React.ReactNode
-}
-
-export const Rating = forwardRef<HTMLDivElement, RatingProps>(
-  function Rating(props, ref) {
-    const { icon, count = 5, label, ...rest } = props
-    return (
-      <RatingGroup.Root ref={ref} count={count} {...rest}>
-        {label && <RatingGroup.Label>{label}</RatingGroup.Label>}
-        <RatingGroup.HiddenInput />
-        <RatingGroup.Control>
-          {Array.from({ length: count }).map((_, index) => (
-            <RatingGroup.Item key={index} index={index + 1}>
-              <RatingGroup.ItemIndicator icon={icon} />
-            </RatingGroup.Item>
-          ))}
-        </RatingGroup.Control>
-      </RatingGroup.Root>
-    )
-  },
-)
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\segmented-control.tsx
-"use client"
-
-import { For, SegmentGroup } from "@chakra-ui/react"
-import { forwardRef, useMemo } from "react"
-
-interface Item {
-  value: string
-  label: React.ReactNode
-  disabled?: boolean
-}
-
-export interface SegmentedControlProps extends SegmentGroup.RootProps {
-  items: Array<string | Item>
-}
-
-function normalize(items: Array<string | Item>): Item[] {
-  return items.map((item) => {
-    if (typeof item === "string") return { value: item, label: item }
-    return item
-  })
-}
-
-export const SegmentedControl = forwardRef<
-  HTMLDivElement,
-  SegmentedControlProps
->(function SegmentedControl(props, ref) {
-  const { items, ...rest } = props
-  const data = useMemo(() => normalize(items), [items])
-
-  return (
-    <SegmentGroup.Root ref={ref} {...rest}>
-      <SegmentGroup.Indicator />
-      <For each={data}>
-        {(item) => (
-          <SegmentGroup.Item
-            key={item.value}
-            value={item.value}
-            disabled={item.disabled}
-          >
-            <SegmentGroup.ItemText>{item.label}</SegmentGroup.ItemText>
-            <SegmentGroup.ItemHiddenInput />
-          </SegmentGroup.Item>
-        )}
-      </For>
-    </SegmentGroup.Root>
-  )
-})
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\select.tsx
-"use client"
-
-import type { CollectionItem } from "@chakra-ui/react"
-import { Select as ChakraSelect, Portal } from "@chakra-ui/react"
-import { CloseButton } from "./close-button"
-import { forwardRef } from "react"
-
-interface SelectTriggerProps extends ChakraSelect.ControlProps {
-  clearable?: boolean
-}
-
-export const SelectTrigger = forwardRef<HTMLButtonElement, SelectTriggerProps>(
-  function SelectTrigger(props, ref) {
-    const { children, clearable, ...rest } = props
-    return (
-      <ChakraSelect.Control {...rest}>
-        <ChakraSelect.Trigger ref={ref}>{children}</ChakraSelect.Trigger>
-        <ChakraSelect.IndicatorGroup>
-          {clearable && <SelectClearTrigger />}
-          <ChakraSelect.Indicator />
-        </ChakraSelect.IndicatorGroup>
-      </ChakraSelect.Control>
-    )
-  },
-)
-
-const SelectClearTrigger = forwardRef<
-  HTMLButtonElement,
-  ChakraSelect.ClearTriggerProps
->(function SelectClearTrigger(props, ref) {
-  return (
-    <ChakraSelect.ClearTrigger asChild {...props} ref={ref}>
-      <CloseButton
-        size="xs"
-        variant="plain"
-        focusVisibleRing="inside"
-        focusRingWidth="2px"
-        pointerEvents="auto"
-      />
-    </ChakraSelect.ClearTrigger>
-  )
-})
-
-interface SelectContentProps extends ChakraSelect.ContentProps {
-  portalled?: boolean
-  portalRef?: React.RefObject<HTMLElement>
-}
-
-export const SelectContent = forwardRef<HTMLDivElement, SelectContentProps>(
-  function SelectContent(props, ref) {
-    const { portalled = true, portalRef, ...rest } = props
-    return (
-      <Portal disabled={!portalled} container={portalRef}>
-        <ChakraSelect.Positioner>
-          <ChakraSelect.Content {...rest} ref={ref} />
-        </ChakraSelect.Positioner>
-      </Portal>
-    )
-  },
-)
-
-export const SelectItem = forwardRef<HTMLDivElement, ChakraSelect.ItemProps>(
-  function SelectItem(props, ref) {
-    const { item, children, ...rest } = props
-    return (
-      <ChakraSelect.Item key={item.value} item={item} {...rest} ref={ref}>
-        {children}
-        <ChakraSelect.ItemIndicator />
-      </ChakraSelect.Item>
-    )
-  },
-)
-
-interface SelectValueTextProps
-  extends Omit<ChakraSelect.ValueTextProps, "children"> {
-  children?(items: CollectionItem[]): React.ReactNode
-}
-
-export const SelectValueText = forwardRef<
-  HTMLSpanElement,
-  SelectValueTextProps
->(function SelectValueText(props, ref) {
-  const { children, ...rest } = props
-  return (
-    <ChakraSelect.ValueText {...rest} ref={ref}>
-      <ChakraSelect.Context>
-        {(select) => {
-          const items = select.selectedItems
-          if (items.length === 0) return props.placeholder
-          if (children) return children(items)
-          if (items.length === 1)
-            return select.collection.stringifyItem(items[0])
-          return `${items.length} selected`
-        }}
-      </ChakraSelect.Context>
-    </ChakraSelect.ValueText>
-  )
-})
-
-export const SelectRoot = forwardRef<HTMLDivElement, ChakraSelect.RootProps>(
-  function SelectRoot(props, ref) {
-    return (
-      <ChakraSelect.Root
-        {...props}
-        ref={ref}
-        positioning={{ sameWidth: true, ...props.positioning }}
-      >
-        {props.asChild ? (
-          props.children
-        ) : (
-          <>
-            <ChakraSelect.HiddenSelect />
-            {props.children}
-          </>
-        )}
-      </ChakraSelect.Root>
-    )
-  },
-) as ChakraSelect.RootComponent
-
-interface SelectItemGroupProps extends ChakraSelect.ItemGroupProps {
-  label: React.ReactNode
-}
-
-export const SelectItemGroup = forwardRef<HTMLDivElement, SelectItemGroupProps>(
-  function SelectItemGroup(props, ref) {
-    const { children, label, ...rest } = props
-    return (
-      <ChakraSelect.ItemGroup {...rest} ref={ref}>
-        <ChakraSelect.ItemGroupLabel>{label}</ChakraSelect.ItemGroupLabel>
-        {children}
-      </ChakraSelect.ItemGroup>
-    )
-  },
-)
-
-export const SelectLabel = ChakraSelect.Label
-export const SelectItemText = ChakraSelect.ItemText
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\skeleton.tsx
-import type {
-  SkeletonProps as ChakraSkeletonProps,
-  CircleProps,
-} from "@chakra-ui/react"
-import { Skeleton as ChakraSkeleton, Circle, Stack } from "@chakra-ui/react"
-import { forwardRef } from "react"
-
-export interface SkeletonCircleProps extends ChakraSkeletonProps {
-  size?: CircleProps["size"]
-}
-
-export const SkeletonCircle = (props: SkeletonCircleProps) => {
-  const { size, ...rest } = props
-  return (
-    <Circle size={size} asChild>
-      <ChakraSkeleton {...rest} />
-    </Circle>
-  )
-}
-
-export interface SkeletonTextProps extends ChakraSkeletonProps {
-  noOfLines?: number
-}
-
-export const SkeletonText = forwardRef<HTMLDivElement, SkeletonTextProps>(
-  function SkeletonText(props, ref) {
-    const { noOfLines = 3, gap, ...rest } = props
-    return (
-      <Stack gap={gap} width="full" ref={ref}>
-        {Array.from({ length: noOfLines }).map((_, index) => (
-          <ChakraSkeleton
-            height="4"
-            key={index}
-            {...props}
-            _last={{ maxW: "80%" }}
-            {...rest}
-          />
-        ))}
-      </Stack>
-    )
-  },
-)
-
-export const Skeleton = ChakraSkeleton
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\slider.tsx
-import { Slider as ChakraSlider, HStack } from "@chakra-ui/react"
-import { forwardRef } from "react"
-
-export interface SliderProps extends ChakraSlider.RootProps {
-  marks?: Array<number | { value: number; label: React.ReactNode }>
-  label?: React.ReactNode
-  showValue?: boolean
-}
-
-export const Slider = forwardRef<HTMLDivElement, SliderProps>(
-  function Slider(props, ref) {
-    const { marks: marksProp, label, showValue, ...rest } = props
-    const value = props.defaultValue ?? props.value
-
-    const marks = marksProp?.map((mark) => {
-      if (typeof mark === "number") return { value: mark, label: undefined }
-      return mark
-    })
-
-    const hasMarkLabel = !!marks?.some((mark) => mark.label)
-
-    return (
-      <ChakraSlider.Root ref={ref} thumbAlignment="center" {...rest}>
-        {label && !showValue && (
-          <ChakraSlider.Label fontWeight="medium">{label}</ChakraSlider.Label>
-        )}
-        {label && showValue && (
-          <HStack justify="space-between">
-            <ChakraSlider.Label fontWeight="medium">{label}</ChakraSlider.Label>
-            <ChakraSlider.ValueText />
-          </HStack>
-        )}
-        <ChakraSlider.Control mb={hasMarkLabel ? "4" : undefined}>
-          <ChakraSlider.Track>
-            <ChakraSlider.Range />
-          </ChakraSlider.Track>
-          {value?.map((_, index) => (
-            <ChakraSlider.Thumb key={index} index={index}>
-              <ChakraSlider.HiddenInput />
-            </ChakraSlider.Thumb>
-          ))}
-        </ChakraSlider.Control>
-        {marks?.length && (
-          <ChakraSlider.MarkerGroup>
-            {marks.map((mark, index) => {
-              const value = typeof mark === "number" ? mark : mark.value
-              const label = typeof mark === "number" ? undefined : mark.label
-              return (
-                <ChakraSlider.Marker key={index} value={value}>
-                  <ChakraSlider.MarkerIndicator />
-                  {label}
-                </ChakraSlider.Marker>
-              )
-            })}
-          </ChakraSlider.MarkerGroup>
-        )}
-      </ChakraSlider.Root>
-    )
-  },
-)
+export default OnlineUsersList;
 
 
 
 // File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\SocketProvider.tsx
-// src/components/ui/SocketProvider.tsx
+// components/SocketProvider.tsx
 "use client";
 import { createContext, useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
@@ -2794,32 +257,72 @@ interface SocketProviderProps {
 
 const SocketProvider = ({ children }: SocketProviderProps) => {
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const socketRef = useRef<Socket | null>(null);
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    console.log("sent token", token);
-
-    if (token && !socketRef.current) {
-      const newSocket = io(`${process.env.NEXT_PUBLIC_BACKEND_URL}/game`, {
-        extraHeaders: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      console.log("newSocket", newSocket);
-      socketRef.current = newSocket;
-      setSocket(newSocket);
-
-      newSocket.on("connect", () => {
-        console.log("Connected to server");
-      });
-
-      return () => {
-        newSocket.disconnect();
-        socketRef.current = null;
-        setSocket(null);
-      };
+  const createSocketConnection = (token: string | null) => {
+    // Disconnect and clean up any existing socket
+    if (socketRef.current) {
+      socketRef.current.disconnect();
+      socketRef.current = null;
+      setSocket(null);
     }
+
+    if (!token) return; // Don't create a connection if there's no token
+
+    const newSocket = io(`${process.env.NEXT_PUBLIC_BACKEND_URL}/game`, {
+      extraHeaders: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log("newSocket", newSocket);
+
+    newSocket.on("connect", () => {
+      console.log("Connected to server");
+    });
+
+    socketRef.current = newSocket;
+    setSocket(newSocket);
+  };
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+    setToken(storedToken); // Set initial token state
+
+    createSocketConnection(storedToken); // Create initial connection if token exists
+
+    return () => {
+      socket?.disconnect();
+      socketRef.current = null;
+      setSocket(null);
+    };
+  }, []);
+
+  // Recreate connection when token changes
+  useEffect(() => {
+    createSocketConnection(token); // Create connection (or disconnect if token is null)
+
+    return () => {
+      socket?.disconnect();
+      socketRef.current = null;
+      setSocket(null);
+    };
+  }, [token]);
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const newToken = localStorage.getItem("token");
+      console.log("newToken", newToken);
+
+      setToken(newToken);
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
   }, []);
 
   return (
@@ -2830,584 +333,6 @@ const SocketProvider = ({ children }: SocketProviderProps) => {
 };
 
 export { SocketContext, SocketProvider };
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\stat.tsx
-import {
-  Badge,
-  type BadgeProps,
-  Stat as ChakraStat,
-  FormatNumber,
-  IconButton,
-} from "@chakra-ui/react"
-import { ToggleTip } from "./toggle-tip"
-import { forwardRef } from "react"
-import { HiOutlineInformationCircle } from "react-icons/hi"
-
-interface StatLabelProps extends ChakraStat.LabelProps {
-  info?: React.ReactNode
-}
-
-export const StatLabel = forwardRef<HTMLDivElement, StatLabelProps>(
-  function StatLabel(props, ref) {
-    const { info, children, ...rest } = props
-    return (
-      <ChakraStat.Label {...rest} ref={ref}>
-        {children}
-        {info && (
-          <ToggleTip content={info}>
-            <IconButton variant="ghost" aria-label="info" size="2xs">
-              <HiOutlineInformationCircle />
-            </IconButton>
-          </ToggleTip>
-        )}
-      </ChakraStat.Label>
-    )
-  },
-)
-
-interface StatValueTextProps extends ChakraStat.ValueTextProps {
-  value?: number
-  formatOptions?: Intl.NumberFormatOptions
-}
-
-export const StatValueText = forwardRef<HTMLDivElement, StatValueTextProps>(
-  function StatValueText(props, ref) {
-    const { value, formatOptions, children, ...rest } = props
-    return (
-      <ChakraStat.ValueText {...rest} ref={ref}>
-        {children ||
-          (value != null && <FormatNumber value={value} {...formatOptions} />)}
-      </ChakraStat.ValueText>
-    )
-  },
-)
-
-export const StatUpTrend = forwardRef<HTMLDivElement, BadgeProps>(
-  function StatUpTrend(props, ref) {
-    return (
-      <Badge colorPalette="green" gap="0" {...props} ref={ref}>
-        <ChakraStat.UpIndicator />
-        {props.children}
-      </Badge>
-    )
-  },
-)
-
-export const StatDownTrend = forwardRef<HTMLDivElement, BadgeProps>(
-  function StatDownTrend(props, ref) {
-    return (
-      <Badge colorPalette="red" gap="0" {...props} ref={ref}>
-        <ChakraStat.DownIndicator />
-        {props.children}
-      </Badge>
-    )
-  },
-)
-
-export const StatRoot = ChakraStat.Root
-export const StatHelpText = ChakraStat.HelpText
-export const StatValueUnit = ChakraStat.ValueUnit
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\status.tsx
-import type { ColorPalette } from "@chakra-ui/react"
-import { Status as ChakraStatus } from "@chakra-ui/react"
-import { forwardRef } from "react"
-
-type StatusValue = "success" | "error" | "warning" | "info"
-
-export interface StatusProps extends ChakraStatus.RootProps {
-  value?: StatusValue
-}
-
-const statusMap: Record<StatusValue, ColorPalette> = {
-  success: "green",
-  error: "red",
-  warning: "orange",
-  info: "blue",
-}
-
-export const Status = forwardRef<HTMLDivElement, StatusProps>(
-  function Status(props, ref) {
-    const { children, value = "info", ...rest } = props
-    const colorPalette = rest.colorPalette ?? statusMap[value]
-    return (
-      <ChakraStatus.Root ref={ref} {...rest} colorPalette={colorPalette}>
-        <ChakraStatus.Indicator />
-        {children}
-      </ChakraStatus.Root>
-    )
-  },
-)
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\stepper-input.tsx
-import { HStack, IconButton, NumberInput } from "@chakra-ui/react"
-import { forwardRef } from "react"
-import { LuMinus, LuPlus } from "react-icons/lu"
-
-export interface StepperInputProps extends NumberInput.RootProps {
-  label?: React.ReactNode
-}
-
-export const StepperInput = forwardRef<HTMLDivElement, StepperInputProps>(
-  function StepperInput(props, ref) {
-    const { label, ...rest } = props
-    return (
-      <NumberInput.Root {...rest} unstyled ref={ref}>
-        {label && <NumberInput.Label>{label}</NumberInput.Label>}
-        <HStack gap="2">
-          <DecrementTrigger />
-          <NumberInput.ValueText textAlign="center" fontSize="lg" minW="3ch" />
-          <IncrementTrigger />
-        </HStack>
-      </NumberInput.Root>
-    )
-  },
-)
-
-const DecrementTrigger = forwardRef<
-  HTMLButtonElement,
-  NumberInput.DecrementTriggerProps
->(function DecrementTrigger(props, ref) {
-  return (
-    <NumberInput.DecrementTrigger {...props} asChild ref={ref}>
-      <IconButton variant="outline" size="sm">
-        <LuMinus />
-      </IconButton>
-    </NumberInput.DecrementTrigger>
-  )
-})
-
-const IncrementTrigger = forwardRef<
-  HTMLButtonElement,
-  NumberInput.IncrementTriggerProps
->(function IncrementTrigger(props, ref) {
-  return (
-    <NumberInput.IncrementTrigger {...props} asChild ref={ref}>
-      <IconButton variant="outline" size="sm">
-        <LuPlus />
-      </IconButton>
-    </NumberInput.IncrementTrigger>
-  )
-})
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\steps.tsx
-import { Box, Steps as ChakraSteps } from "@chakra-ui/react"
-import { LuCheck } from "react-icons/lu"
-
-interface StepInfoProps {
-  title?: React.ReactNode
-  description?: React.ReactNode
-}
-
-export interface StepsItemProps
-  extends Omit<ChakraSteps.ItemProps, "title">,
-    StepInfoProps {
-  completedIcon?: React.ReactNode
-  icon?: React.ReactNode
-}
-
-export const StepsItem = (props: StepsItemProps) => {
-  const { title, description, completedIcon, icon, ...rest } = props
-  return (
-    <ChakraSteps.Item {...rest}>
-      <ChakraSteps.Trigger>
-        <ChakraSteps.Indicator>
-          <ChakraSteps.Status
-            complete={completedIcon || <LuCheck />}
-            incomplete={icon || <ChakraSteps.Number />}
-          />
-        </ChakraSteps.Indicator>
-        <StepInfo title={title} description={description} />
-      </ChakraSteps.Trigger>
-      <ChakraSteps.Separator />
-    </ChakraSteps.Item>
-  )
-}
-
-const StepInfo = (props: StepInfoProps) => {
-  const { title, description } = props
-  if (title && description) {
-    return (
-      <Box>
-        <ChakraSteps.Title>{title}</ChakraSteps.Title>
-        <ChakraSteps.Description>{description}</ChakraSteps.Description>
-      </Box>
-    )
-  }
-  return (
-    <>
-      {title && <ChakraSteps.Title>{title}</ChakraSteps.Title>}
-      {description && (
-        <ChakraSteps.Description>{description}</ChakraSteps.Description>
-      )}
-    </>
-  )
-}
-
-interface StepsIndicatorProps {
-  completedIcon: React.ReactNode
-  icon?: React.ReactNode
-}
-
-export const StepsIndicator = (props: StepsIndicatorProps) => {
-  const { icon = <ChakraSteps.Number />, completedIcon } = props
-  return (
-    <ChakraSteps.Indicator>
-      <ChakraSteps.Status complete={completedIcon} incomplete={icon} />
-    </ChakraSteps.Indicator>
-  )
-}
-
-export const StepsList = ChakraSteps.List
-export const StepsRoot = ChakraSteps.Root
-export const StepsContent = ChakraSteps.Content
-export const StepsCompletedContent = ChakraSteps.CompletedContent
-
-export const StepsNextTrigger = (props: ChakraSteps.NextTriggerProps) => {
-  return <ChakraSteps.NextTrigger {...props} />
-}
-
-export const StepsPrevTrigger = (props: ChakraSteps.PrevTriggerProps) => {
-  return <ChakraSteps.PrevTrigger {...props} />
-}
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\switch.tsx
-import { Switch as ChakraSwitch } from "@chakra-ui/react"
-import { forwardRef } from "react"
-
-export interface SwitchProps extends ChakraSwitch.RootProps {
-  inputProps?: React.InputHTMLAttributes<HTMLInputElement>
-  rootRef?: React.Ref<HTMLLabelElement>
-  trackLabel?: { on: React.ReactNode; off: React.ReactNode }
-  thumbLabel?: { on: React.ReactNode; off: React.ReactNode }
-}
-
-export const Switch = forwardRef<HTMLInputElement, SwitchProps>(
-  function Switch(props, ref) {
-    const { inputProps, children, rootRef, trackLabel, thumbLabel, ...rest } =
-      props
-
-    return (
-      <ChakraSwitch.Root ref={rootRef} {...rest}>
-        <ChakraSwitch.HiddenInput ref={ref} {...inputProps} />
-        <ChakraSwitch.Control>
-          <ChakraSwitch.Thumb>
-            {thumbLabel && (
-              <ChakraSwitch.ThumbIndicator fallback={thumbLabel?.off}>
-                {thumbLabel?.on}
-              </ChakraSwitch.ThumbIndicator>
-            )}
-          </ChakraSwitch.Thumb>
-          {trackLabel && (
-            <ChakraSwitch.Indicator fallback={trackLabel.off}>
-              {trackLabel.on}
-            </ChakraSwitch.Indicator>
-          )}
-        </ChakraSwitch.Control>
-        {children != null && (
-          <ChakraSwitch.Label>{children}</ChakraSwitch.Label>
-        )}
-      </ChakraSwitch.Root>
-    )
-  },
-)
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\tag.tsx
-import { Tag as ChakraTag } from "@chakra-ui/react"
-import { forwardRef } from "react"
-
-export interface TagProps extends ChakraTag.RootProps {
-  startElement?: React.ReactNode
-  endElement?: React.ReactNode
-  onClose?: VoidFunction
-  closable?: boolean
-}
-
-export const Tag = forwardRef<HTMLSpanElement, TagProps>(
-  function Tag(props, ref) {
-    const {
-      startElement,
-      endElement,
-      onClose,
-      closable = !!onClose,
-      children,
-      ...rest
-    } = props
-
-    return (
-      <ChakraTag.Root ref={ref} {...rest}>
-        {startElement && (
-          <ChakraTag.StartElement>{startElement}</ChakraTag.StartElement>
-        )}
-        <ChakraTag.Label>{children}</ChakraTag.Label>
-        {endElement && (
-          <ChakraTag.EndElement>{endElement}</ChakraTag.EndElement>
-        )}
-        {closable && (
-          <ChakraTag.EndElement>
-            <ChakraTag.CloseTrigger onClick={onClose} />
-          </ChakraTag.EndElement>
-        )}
-      </ChakraTag.Root>
-    )
-  },
-)
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\timeline.tsx
-import { Timeline as ChakraTimeline } from "@chakra-ui/react"
-
-export const TimelineRoot = ChakraTimeline.Root
-export const TimelineContent = ChakraTimeline.Content
-export const TimelineItem = ChakraTimeline.Item
-export const TimelineIndicator = ChakraTimeline.Indicator
-export const TimelineTitle = ChakraTimeline.Title
-export const TimelineDescription = ChakraTimeline.Description
-
-export const TimelineConnector = (props: ChakraTimeline.IndicatorProps) => {
-  return (
-    <ChakraTimeline.Connector>
-      <ChakraTimeline.Separator />
-      <ChakraTimeline.Indicator {...props} />
-    </ChakraTimeline.Connector>
-  )
-}
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\toaster.tsx
-"use client"
-
-import {
-  Toaster as ChakraToaster,
-  Portal,
-  Spinner,
-  Stack,
-  Toast,
-  createToaster,
-} from "@chakra-ui/react"
-
-export const toaster = createToaster({
-  placement: "bottom-end",
-  pauseOnPageIdle: true,
-})
-
-export const Toaster = () => {
-  return (
-    <Portal>
-      <ChakraToaster toaster={toaster} insetInline={{ mdDown: "4" }}>
-        {(toast) => (
-          <Toast.Root width={{ md: "sm" }}>
-            {toast.type === "loading" ? (
-              <Spinner size="sm" color="blue.solid" />
-            ) : (
-              <Toast.Indicator />
-            )}
-            <Stack gap="1" flex="1" maxWidth="100%">
-              {toast.title && <Toast.Title>{toast.title}</Toast.Title>}
-              {toast.description && (
-                <Toast.Description>{toast.description}</Toast.Description>
-              )}
-            </Stack>
-            {toast.action && (
-              <Toast.ActionTrigger>{toast.action.label}</Toast.ActionTrigger>
-            )}
-            {toast.meta?.closable && <Toast.CloseTrigger />}
-          </Toast.Root>
-        )}
-      </ChakraToaster>
-    </Portal>
-  )
-}
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\toggle-tip.tsx
-import { Popover as ChakraPopover, IconButton, Portal } from "@chakra-ui/react"
-import { forwardRef } from "react"
-import { HiOutlineInformationCircle } from "react-icons/hi"
-
-export interface ToggleTipProps extends ChakraPopover.RootProps {
-  showArrow?: boolean
-  portalled?: boolean
-  portalRef?: React.RefObject<HTMLElement>
-  content?: React.ReactNode
-}
-
-export const ToggleTip = forwardRef<HTMLDivElement, ToggleTipProps>(
-  function ToggleTip(props, ref) {
-    const {
-      showArrow,
-      children,
-      portalled = true,
-      content,
-      portalRef,
-      ...rest
-    } = props
-
-    return (
-      <ChakraPopover.Root
-        {...rest}
-        positioning={{ ...rest.positioning, gutter: 4 }}
-      >
-        <ChakraPopover.Trigger asChild>{children}</ChakraPopover.Trigger>
-        <Portal disabled={!portalled} container={portalRef}>
-          <ChakraPopover.Positioner>
-            <ChakraPopover.Content
-              width="auto"
-              px="2"
-              py="1"
-              textStyle="xs"
-              rounded="sm"
-              ref={ref}
-            >
-              {showArrow && (
-                <ChakraPopover.Arrow>
-                  <ChakraPopover.ArrowTip />
-                </ChakraPopover.Arrow>
-              )}
-              {content}
-            </ChakraPopover.Content>
-          </ChakraPopover.Positioner>
-        </Portal>
-      </ChakraPopover.Root>
-    )
-  },
-)
-
-export const InfoTip = (props: Partial<ToggleTipProps>) => {
-  const { children, ...rest } = props
-  return (
-    <ToggleTip content={children} {...rest}>
-      <IconButton variant="ghost" aria-label="info" size="2xs">
-        <HiOutlineInformationCircle />
-      </IconButton>
-    </ToggleTip>
-  )
-}
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\toggle.tsx
-"use client"
-
-import type { ButtonProps } from "@chakra-ui/react"
-import {
-  Button,
-  Toggle as ChakraToggle,
-  useToggleContext,
-} from "@chakra-ui/react"
-import { forwardRef } from "react"
-
-interface ToggleProps extends ChakraToggle.RootProps {
-  variant?: keyof typeof variantMap
-  size?: ButtonProps["size"]
-}
-
-const variantMap = {
-  solid: { on: "solid", off: "outline" },
-  surface: { on: "surface", off: "outline" },
-  subtle: { on: "subtle", off: "ghost" },
-  ghost: { on: "subtle", off: "ghost" },
-} as const
-
-export const Toggle = forwardRef<HTMLButtonElement, ToggleProps>(
-  function Toggle(props, ref) {
-    const { variant = "subtle", size, children, ...rest } = props
-    const variantConfig = variantMap[variant]
-
-    return (
-      <ChakraToggle.Root asChild {...rest}>
-        <ToggleBaseButton size={size} variant={variantConfig} ref={ref}>
-          {children}
-        </ToggleBaseButton>
-      </ChakraToggle.Root>
-    )
-  },
-)
-
-interface ToggleBaseButtonProps extends Omit<ButtonProps, "variant"> {
-  variant: Record<"on" | "off", ButtonProps["variant"]>
-}
-
-const ToggleBaseButton = forwardRef<HTMLButtonElement, ToggleBaseButtonProps>(
-  function ToggleBaseButton(props, ref) {
-    const toggle = useToggleContext()
-    const { variant, ...rest } = props
-    return (
-      <Button
-        variant={toggle.pressed ? variant.on : variant.off}
-        ref={ref}
-        {...rest}
-      />
-    )
-  },
-)
-
-export const ToggleIndicator = ChakraToggle.Indicator
-
-
-
-// File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\components\ui\tooltip.tsx
-import { Tooltip as ChakraTooltip, Portal } from "@chakra-ui/react"
-import { forwardRef } from "react"
-
-export interface TooltipProps extends ChakraTooltip.RootProps {
-  showArrow?: boolean
-  portalled?: boolean
-  portalRef?: React.RefObject<HTMLElement>
-  content: React.ReactNode
-  contentProps?: ChakraTooltip.ContentProps
-  disabled?: boolean
-}
-
-export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
-  function Tooltip(props, ref) {
-    const {
-      showArrow,
-      children,
-      disabled,
-      portalled,
-      content,
-      contentProps,
-      portalRef,
-      ...rest
-    } = props
-
-    if (disabled) return children
-
-    return (
-      <ChakraTooltip.Root {...rest}>
-        <ChakraTooltip.Trigger asChild>{children}</ChakraTooltip.Trigger>
-        <Portal disabled={!portalled} container={portalRef}>
-          <ChakraTooltip.Positioner>
-            <ChakraTooltip.Content ref={ref} {...contentProps}>
-              {showArrow && (
-                <ChakraTooltip.Arrow>
-                  <ChakraTooltip.ArrowTip />
-                </ChakraTooltip.Arrow>
-              )}
-              {content}
-            </ChakraTooltip.Content>
-          </ChakraTooltip.Positioner>
-        </Portal>
-      </ChakraTooltip.Root>
-    )
-  },
-)
 
 
 
@@ -3424,12 +349,12 @@ import {
   Stack,
   Fieldset,
 } from "@chakra-ui/react";
-import { Field } from "@/components/ui/field";
-import { InputGroup } from "@/components/ui/input-group";
+import { Field } from "@/components/chakra/field";
+import { InputGroup } from "@/components/chakra/input-group";
 import { useState } from "react";
 import { useRouter } from "next/navigation"; // Import from next/navigation
 import { FaUser, FaLock } from "react-icons/fa";
-import { Toaster, toaster } from "@/components/ui/toaster";
+import { Toaster, toaster } from "@/components/chakra/toaster";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -3480,7 +405,7 @@ export default function LoginPage() {
         description: "You have successfully logged in.",
         type: "success",
       });
-      router.push("/"); // Redirect using next/navigation
+      router.push("/play"); // Redirect using next/navigation
     } catch (error) {
       // Handle unexpected errors
       setError("An unexpected error occurred.");
@@ -3502,14 +427,14 @@ export default function LoginPage() {
       minH="100vh"
     >
       <Toaster />
-      <VStack spacing={4} align="center" width="100%">
+      <VStack rowGap={4} align="center" width="100%">
         <Heading as="h1" size="lg" mb={4}>
           Login
         </Heading>
 
         <Box as="form" onSubmit={handleSubmit} width="100%">
           <Fieldset.Root size="lg" maxW="md">
-            <Stack spacing={4}>
+            <Stack rowGap={4}>
               {/* <Fieldset.Legend>Login</Fieldset.Legend> */}
               <Fieldset.HelperText>
                 Please provide your login details below.
@@ -3573,12 +498,12 @@ import {
   Stack,
   Fieldset,
 } from "@chakra-ui/react";
-import { Toaster, toaster } from "../../../components/ui/toaster";
-import { Field } from "@/components/ui/field";
+import { Toaster, toaster } from "../../../components/chakra/toaster";
+import { Field } from "@/components/chakra/field";
 import {
   NativeSelectField,
   NativeSelectRoot,
-} from "@/components/ui/native-select";
+} from "@/components/chakra/native-select";
 import { useState } from "react";
 import { useRouter } from "next/navigation"; // Import from next/navigation
 
@@ -3707,18 +632,36 @@ export default function SignUpPage() {
 // File: \Wisflux\Internship Assignments\UGIG self draft\ugig-01\src\app\play\page.tsx
 // src/app/play/page.tsx
 "use client";
-import { Box, Container, VStack } from "@chakra-ui/react";
-import { io } from "socket.io-client";
+import {
+  Box,
+  Button,
+  Container,
+  Heading,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
+// import { io } from "socket.io-client";
 import { useEffect, useState, useContext } from "react";
 import GameGrid from "../../components/ui/Grid";
 import OnlineUsersList from "../../components/ui/OnlineUsersList";
-import { SocketContext } from "../../components/ui/SocketProvider";
+import {
+  SocketContext,
+  SocketProvider,
+} from "../../components/ui/SocketProvider";
+import { Toaster, toaster } from "@/components/chakra/toaster";
 
 export default function Play() {
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
+  const [roomId, setRoomId] = useState<string | null>(null);
+
   const [selectedCells, setSelectedCells] = useState<Record<string, string>>(
     {}
   );
+  const [invitationSent, setInvitationSent] = useState(false);
+  const [receivedInvite, setReceivedInvite] = useState<{
+    from: string;
+  } | null>(null);
+  const [opponentUsername, setOpponentUsername] = useState<string | null>(null);
 
   const { socket } = useContext(SocketContext);
   console.log("play page socket", socket);
@@ -3731,9 +674,48 @@ export default function Play() {
       });
 
       socket.on("updateUserList", (users: any) => {
-        setOnlineUsers(users);
+        const otherUsers = users.filter(
+          (user: any) => user !== localStorage.getItem("username")
+        );
+        setOnlineUsers(otherUsers); // Update state with other users
       });
+      socket.on("joinedRoom", (data) => {
+        setRoomId(data.roomId);
+        console.log("Joined room:", data.roomId);
+      });
+      socket.on("receiveInvite", (data) => {
+        console.log("Received invite from:", data.from);
+        setReceivedInvite(data); // Set receivedInvite state
+        toaster.create({
+          title: `Received invite from ${data.from}`,
+          type: "info",
+          duration: 10000,
+        });
+      });
+      socket.on("joinedRoom", (data) => {
+        setRoomId(data.roomId);
+        if (receivedInvite && receivedInvite.from) {
+          setOpponentUsername(receivedInvite.from); // Set opponent username when joining a room via invite
+        } else if (invitationSent) {
+          // if you are the one who sent the invitation
 
+          setOpponentUsername((prevOpponent) => {
+            if (prevOpponent) return prevOpponent; // keeps the previous username if available
+
+            if (onlineUsers.length) return onlineUsers[0]; // keeps the first player in the onlineUserList as the opponent
+
+            return null; // return null if no opponent found
+          });
+        }
+        console.log("Joined room:", data.roomId);
+
+        toaster.create({
+          title: `Joined Room`,
+          description: `Room ID :  ${data.roomId}`,
+          type: "info",
+          duration: 9000,
+        });
+      });
       socket.on("cellSelected", (data: any) => {
         console.log(`Client ${data.username} selected cell ${data.cell}`);
 
@@ -3743,30 +725,87 @@ export default function Play() {
       return () => {
         socket.off("connect");
         socket.off("updateUserList");
+        socket.off("receiveInvite"); // Remove this listener too
+        socket.off("joinedRoom");
         socket.off("cellSelected");
       };
     }
-  }, [socket]);
+  }, [socket, toaster, receivedInvite, invitationSent, onlineUsers]);
+
+  const handleInvite = (userToInvite: string) => {
+    console.log("Inviting user:", userToInvite);
+    if (socket && localStorage.getItem("username")) {
+      socket.emit("sendInvite", { to: userToInvite }); // Correct event name
+      console.log(`Sending invite to ${userToInvite}`);
+      setInvitationSent(true);
+    }
+  };
+  const handleAcceptInvite = () => {
+    if (socket && receivedInvite) {
+      console.log("Accepting invite from:", receivedInvite.from);
+      socket.emit("acceptInvite", receivedInvite); // Emit acceptInvite with payload
+      setInvitationSent(false);
+    }
+  };
+  const handleJoinRoom = (roomId: string) => {
+    if (socket) {
+      console.log("Joining room", roomId);
+      socket.emit("joinRoom", { roomId });
+    }
+  };
 
   const handleCellClick = (cell: string) => {
-    if (socket) {
+    if (socket && roomId) {
       socket.emit("selectCell", cell);
       console.log("Cell clicked:", cell);
     }
   };
 
   return (
-    <Box>
-      <Container maxW="container.xl" centerContent>
-        <VStack rowGap={8} align="center">
-          <GameGrid
-            handleCellClick={handleCellClick}
-            selectedCells={selectedCells}
-          />
-          <OnlineUsersList />
-        </VStack>
-      </Container>
-    </Box>
+    <SocketProvider>
+      <Box>
+        <Container maxW="container.xl" centerContent>
+          <Toaster />
+          <VStack rowGap={8} align="center">
+            {/* Conditionally render sections based on game state */}
+            {!roomId && ( // Show online users and invite controls if not in a room
+              <>
+                <OnlineUsersList
+                  onlineUsers={onlineUsers}
+                  handleInvite={handleInvite}
+                />
+
+                {/* Show accept invite button if an invite has been received */}
+
+                {receivedInvite && (
+                  <Button
+                    onClick={handleAcceptInvite}
+                    disabled={!receivedInvite}
+                  >
+                    Accept Invite from {receivedInvite?.from}
+                  </Button>
+                )}
+              </>
+            )}
+
+            {roomId && opponentUsername ? ( // Render game if in a room
+              <>
+                <Heading size="md">
+                  Playing with: {opponentUsername} (Room: {roomId})
+                </Heading>
+
+                <GameGrid
+                  handleCellClick={handleCellClick}
+                  selectedCells={selectedCells}
+                />
+              </>
+            ) : (
+              <Text>Waiting to Create or Join a room...</Text>
+            )}
+          </VStack>
+        </Container>
+      </Box>{" "}
+    </SocketProvider>
   );
 }
 
@@ -3922,7 +961,7 @@ body {
 import type { Metadata } from "next";
 import { Inter, Pixelify_Sans } from "next/font/google";
 import "./globals.css";
-import { Provider } from "../components/ui/provider";
+import { Provider } from "../components/chakra/provider";
 import { SocketProvider } from "@/components/ui/SocketProvider";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -3942,9 +981,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.className} `}>
         {" "}
-        <Provider>
-          <SocketProvider>{children}</SocketProvider>
-        </Provider>
+        <Provider>{children}</Provider>
       </body>
     </html>
   );
@@ -3979,7 +1016,7 @@ import {
   DrawerRoot,
   DrawerTitle,
   DrawerTrigger,
-} from "@/components/ui/drawer";
+} from "@/components/chakra/drawer";
 import { useRouter } from "next/navigation";
 import Particles, { initParticlesEngine } from "@tsparticles/react";
 import { loadSlim } from "@tsparticles/slim";
@@ -4176,7 +1213,7 @@ export default function Home() {
           mt={12}
         >
           <VStack
-            rowGap={10}
+            rowGap={20}
             align="center"
             css={{
               zIndex: 1000,
@@ -4194,7 +1231,7 @@ export default function Home() {
             <Box
               as={Button}
               className={` bg-gradient-to-r from-gray-700 to-gray-900 px-4 `}
-              size="lg"
+              // size="lg"
               onClick={handleLaunchGame}
               animation="glow 1.5s infinite"
               _hover={{
@@ -4206,7 +1243,7 @@ export default function Home() {
             >
               LAUNCH GAME
             </Box>
-            <OnlineUsers />
+            {/* <OnlineUsers /> */}
           </VStack>
         </Flex>
       </Container>

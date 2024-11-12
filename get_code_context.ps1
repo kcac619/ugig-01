@@ -99,6 +99,11 @@ function Read-Files($dir) {
                 }
             }
 
+            # Check if the file is under 'src/components/chakra'
+            if ($_.FullName -like "*\src\components\chakra\*") {
+                $should_ignore = $true
+            }
+
             # If the file should not be ignored and has not been processed yet
             if (-not $should_ignore -and -not $processed_files.ContainsKey($_.FullName)) {
                 # Mark the file as processed

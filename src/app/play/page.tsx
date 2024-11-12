@@ -16,7 +16,7 @@ import {
   SocketContext,
   SocketProvider,
 } from "../../components/ui/SocketProvider";
-import { Toaster, toaster } from "@/components/ui/toaster";
+import { Toaster, toaster } from "@/components/chakra/toaster";
 
 export default function Play() {
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
@@ -25,13 +25,11 @@ export default function Play() {
   const [selectedCells, setSelectedCells] = useState<Record<string, string>>(
     {}
   );
-  const [inviteSent, setInviteSent] = useState(false); // Track invite status
-  const [receivedInvite, setReceivedInvite] = useState<
-    | {
-        from: string;
-      }
-    | undefined
-  >(undefined);
+  const [invitationSent, setInvitationSent] = useState(false);
+  const [receivedInvite, setReceivedInvite] = useState<{
+    from: string;
+  } | null>(null);
+  const [opponentUsername, setOpponentUsername] = useState<string | null>(null);
 
   const { socket } = useContext(SocketContext);
   console.log("play page socket", socket);
@@ -64,6 +62,19 @@ export default function Play() {
       });
       socket.on("joinedRoom", (data) => {
         setRoomId(data.roomId);
+        if (receivedInvite && receivedInvite.from) {
+          setOpponentUsername(receivedInvite.from); // Set opponent username when joining a room via invite
+        } else if (invitationSent) {
+          // if you are the one who sent the invitation
+
+          setOpponentUsername((prevOpponent) => {
+            if (prevOpponent) return prevOpponent; // keeps the previous username if available
+
+            if (onlineUsers.length) return onlineUsers[0]; // keeps the first player in the onlineUserList as the opponent
+
+            return null; // return null if no opponent found
+          });
+        }
         console.log("Joined room:", data.roomId);
 
         toaster.create({
@@ -87,19 +98,22 @@ export default function Play() {
         socket.off("cellSelected");
       };
     }
-  }, [socket, toaster]);
+  }, [socket, toaster, receivedInvite, invitationSent, onlineUsers]);
 
   const handleInvite = (userToInvite: string) => {
+    console.log("Inviting user:", userToInvite);
+    console.log("socket before sendinvite", socket || "no socket");
     if (socket && localStorage.getItem("username")) {
-      console.log(`Sending invite to ${userToInvite}`);
       socket.emit("sendInvite", { to: userToInvite }); // Correct event name
-      setInviteSent(true);
+      console.log(`Sending invite to ${userToInvite}`);
+      setInvitationSent(true);
     }
   };
   const handleAcceptInvite = () => {
     if (socket && receivedInvite) {
       console.log("Accepting invite from:", receivedInvite.from);
       socket.emit("acceptInvite", receivedInvite); // Emit acceptInvite with payload
+      setInvitationSent(false);
     }
   };
   const handleJoinRoom = (roomId: string) => {
@@ -120,44 +134,46 @@ export default function Play() {
     <SocketProvider>
       <Box>
         <Container maxW="container.xl" centerContent>
+          <Toaster />
           <VStack rowGap={8} align="center">
-            {/* Show user list if not in a room */}
-
-            {!roomId && (
+            {/* Conditionally render sections based on game state */}
+            {!roomId && ( // Show online users and invite controls if not in a room
               <>
                 <OnlineUsersList
                   onlineUsers={onlineUsers}
                   handleInvite={handleInvite}
                 />
+
+                {/* Show accept invite button if an invite has been received */}
+
                 {receivedInvite && (
-                  <Button onClick={handleAcceptInvite}>
-                    Accept Invite from {receivedInvite.from}
+                  <Button
+                    onClick={handleAcceptInvite}
+                    disabled={!receivedInvite}
+                  >
+                    Accept Invite from {receivedInvite?.from}
                   </Button>
                 )}
               </>
             )}
 
-            {/* Conditionally render the rest based on roomId */}
-
-            {roomId ? ( // Only show room details and game if in a room
+            {roomId && opponentUsername ? ( // Render game if in a room
               <>
-                <Heading size="md">In Room: {roomId}</Heading>
+                <Heading size="md">
+                  Playing with: {opponentUsername} (Room: {roomId})
+                </Heading>
+
                 <GameGrid
                   handleCellClick={handleCellClick}
                   selectedCells={selectedCells}
                 />
-                <OnlineUsersList
-                  onlineUsers={onlineUsers}
-                  handleInvite={handleInvite}
-                />{" "}
-                {/* Pass handleInvite */}
               </>
             ) : (
               <Text>Waiting to Create or Join a room...</Text>
             )}
           </VStack>
         </Container>
-      </Box>
+      </Box>{" "}
     </SocketProvider>
   );
 }

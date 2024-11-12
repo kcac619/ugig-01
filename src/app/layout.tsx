@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Pixelify_Sans } from "next/font/google";
 import "./globals.css";
-import { Provider } from "../components/ui/provider";
+import { Provider } from "../components/chakra/provider";
 import { SocketProvider } from "@/components/ui/SocketProvider";
 
 const inter = Inter({ subsets: ["latin"] });

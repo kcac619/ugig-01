@@ -24,7 +24,7 @@ import {
   DrawerRoot,
   DrawerTitle,
   DrawerTrigger,
-} from "@/components/ui/drawer";
+} from "@/components/chakra/drawer";
 import { useRouter } from "next/navigation";
 import Particles, { initParticlesEngine } from "@tsparticles/react";
 import { loadSlim } from "@tsparticles/slim";

@@ -10,12 +10,12 @@ import {
   Stack,
   Fieldset,
 } from "@chakra-ui/react";
-import { Toaster, toaster } from "../../../components/ui/toaster";
-import { Field } from "@/components/ui/field";
+import { Toaster, toaster } from "../../../components/chakra/toaster";
+import { Field } from "@/components/chakra/field";
 import {
   NativeSelectField,
   NativeSelectRoot,
-} from "@/components/ui/native-select";
+} from "@/components/chakra/native-select";
 import { useState } from "react";
 import { useRouter } from "next/navigation"; // Import from next/navigation
 

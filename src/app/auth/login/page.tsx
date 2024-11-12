@@ -10,12 +10,12 @@ import {
   Stack,
   Fieldset,
 } from "@chakra-ui/react";
-import { Field } from "@/components/ui/field";
-import { InputGroup } from "@/components/ui/input-group";
+import { Field } from "@/components/chakra/field";
+import { InputGroup } from "@/components/chakra/input-group";
 import { useState } from "react";
 import { useRouter } from "next/navigation"; // Import from next/navigation
 import { FaUser, FaLock } from "react-icons/fa";
-import { Toaster, toaster } from "@/components/ui/toaster";
+import { Toaster, toaster } from "@/components/chakra/toaster";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -66,7 +66,7 @@ export default function LoginPage() {
         description: "You have successfully logged in.",
         type: "success",
       });
-      router.push("/"); // Redirect using next/navigation
+      router.push("/play"); // Redirect using next/navigation
     } catch (error) {
       // Handle unexpected errors
       setError("An unexpected error occurred.");
